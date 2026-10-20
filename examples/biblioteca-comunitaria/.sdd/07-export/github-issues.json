@@ -1,0 +1,130 @@
+[
+  {
+    "title": "[EP001] Acervo e sócios",
+    "body": "",
+    "labels": [
+      "epico",
+      "epic"
+    ]
+  },
+  {
+    "title": "[US001] Cadastrar livro",
+    "body": "Como bibliotecária, quero cadastrar livros no acervo para controlar quais títulos estão disponíveis.\n\nCritérios de aceite:\n- AC001.1 (BDD): Dado que a bibliotecária está autenticada Quando informa título, autor e código do livro e confirma Então o livro aparece na lista do acervo com status \"disponível\"\n- AC001.2 (EARS): Se o código informado já existir no acervo, então o sistema deve recusar o cadastro e exibir a mensagem \"Código já cadastrado\".\n\nPai: EP001",
+    "labels": [
+      "mvp",
+      "story"
+    ]
+  },
+  {
+    "title": "[TSK002] Modelar e migrar tabelas livro, sócio e empréstimo",
+    "body": "criar entidades conforme er.mmd e migrações.\n\nDoD:\n- [ ] migrações aplicam e revertem sem erro\n- [ ] restrições de unicidade para código do livro e carteirinha\nRefs: US001, US002, US003, AC001.1\nDepende de: TSK001\n\nPai: US001",
+    "labels": [
+      "dados",
+      "task"
+    ]
+  },
+  {
+    "title": "[TSK003] API de cadastro de livros",
+    "body": "endpoint de criação e listagem com validação de código duplicado.\n\nDoD:\n- [ ] AC001.1 e AC001.2 atendidos\n- [ ] revisão de código\nRefs: US001, AC001.1, AC001.2\nDepende de: TSK002\n\nPai: US001",
+    "labels": [
+      "backend",
+      "task"
+    ]
+  },
+  {
+    "title": "[TSK004] Autenticação da bibliotecária",
+    "body": "login com política de senha de 10 caracteres ou mais.\n\nDoD:\n- [ ] rotas da bibliotecária exigem sessão válida\n- [ ] política de senha aplicada\nRefs: RNF002, US001\nDepende de: TSK001\n\nPai: US001",
+    "labels": [
+      "seguranca",
+      "task"
+    ]
+  },
+  {
+    "title": "[TSK008] Telas da bibliotecária (livros, sócios, empréstimo, devolução)",
+    "body": "interface web responsiva consumindo as APIs.\n\nDoD:\n- [ ] fluxos principais navegáveis ponta a ponta\n- [ ] revisão de usabilidade com a bibliotecária\nRefs: US001, US002, US003, US004\nDepende de: TSK006, TSK007\n\nPai: US001",
+    "labels": [
+      "frontend",
+      "task"
+    ]
+  },
+  {
+    "title": "[US002] Cadastrar sócio",
+    "body": "Como bibliotecária, quero cadastrar sócios para registrar quem pode pegar livros emprestados.\n\nCritérios de aceite:\n- AC002.1 (BDD): Dado que a bibliotecária está autenticada Quando informa nome e telefone do sócio e confirma Então o sistema gera um número de carteirinha único e exibe o sócio como \"ativo\"\n\nPai: EP001",
+    "labels": [
+      "mvp",
+      "story"
+    ]
+  },
+  {
+    "title": "[TSK005] API de cadastro de sócios",
+    "body": "criação de sócio com geração de número de carteirinha único.\n\nDoD:\n- [ ] AC002.1 atendido\nRefs: US002, AC002.1\nDepende de: TSK002\n\nPai: US002",
+    "labels": [
+      "backend",
+      "task"
+    ]
+  },
+  {
+    "title": "[EP002] Empréstimos",
+    "body": "",
+    "labels": [
+      "epico",
+      "epic"
+    ]
+  },
+  {
+    "title": "[US003] Registrar empréstimo",
+    "body": "Como bibliotecária, quero registrar o empréstimo de um livro a um sócio para controlar prazos e disponibilidade.\n\nCritérios de aceite:\n- AC003.1 (BDD): Dado que o livro está disponível e o sócio possui menos de 3 empréstimos ativos Quando a bibliotecária registra o empréstimo Então o livro passa a \"emprestado\" e a data de vencimento é a data atual mais 14 dias\n- AC003.2 (EARS): Se o sócio já possuir 3 empréstimos ativos, então o sistema deve impedir o novo empréstimo e informar o limite.\n- AC003.3 (EARS): Se o livro estiver com status \"emprestado\", então o sistema deve impedir o empréstimo e informar a data prevista de devolução.\n\nPai: EP002",
+    "labels": [
+      "mvp",
+      "story"
+    ]
+  },
+  {
+    "title": "[TSK006] API de empréstimo com regras de prazo e limite",
+    "body": "registrar empréstimo calculando vencimento e validando limite e disponibilidade.\n\nDoD:\n- [ ] AC003.1 a AC003.3 atendidos\n- [ ] cenário concorrente de dois empréstimos do mesmo livro coberto\nRefs: US003, AC003.1, AC003.2, AC003.3, RN001, RN002\nDepende de: TSK003, TSK005\n\nPai: US003",
+    "labels": [
+      "backend",
+      "task"
+    ]
+  },
+  {
+    "title": "[US004] Registrar devolução com multa",
+    "body": "Como bibliotecária, quero registrar a devolução e calcular a multa de atraso para liberar o livro e cobrar o valor devido.\n\nCritérios de aceite:\n- AC004.1 (BDD): Dado que existe um empréstimo ativo vencido há 4 dias Quando a bibliotecária registra a devolução Então o livro volta a \"disponível\" e o sistema exibe multa de R$ 2,00\n- AC004.2 (EARS): Quando a devolução ocorrer até a data de vencimento, o sistema deve concluir a devolução sem multa.\n\nPai: EP002",
+    "labels": [
+      "mvp",
+      "story"
+    ]
+  },
+  {
+    "title": "[TSK007] API de devolução e cálculo de multa",
+    "body": "registrar devolução, liberar livro e calcular multa por dia corrido.\n\nDoD:\n- [ ] AC004.1 e AC004.2 atendidos\nRefs: US004, AC004.1, AC004.2, RN003\nDepende de: TSK006\n\nPai: US004",
+    "labels": [
+      "backend",
+      "task"
+    ]
+  },
+  {
+    "title": "[US005] Consultar meus empréstimos",
+    "body": "Como sócio, quero consultar meus empréstimos e vencimentos pelo celular para devolver os livros no prazo.\n\nCritérios de aceite:\n- AC005.1 (BDD): Dado que o sócio informa seu número de carteirinha Quando abre a consulta Então vê a lista de livros emprestados com a data de vencimento de cada um\n\nPai: EP002",
+    "labels": [
+      "story"
+    ]
+  },
+  {
+    "title": "[TSK009] Consulta de empréstimos do sócio (mobile)",
+    "body": "página responsiva de consulta por número de carteirinha.\n\nDoD:\n- [ ] AC005.1 atendido\n- [ ] p95 abaixo de 2 s medido em teste de carga leve\nRefs: US005, AC005.1, RNF001\nDepende de: TSK006\n\nPai: US005",
+    "labels": [
+      "frontend",
+      "task"
+    ]
+  },
+  {
+    "title": "[TSK001] Preparar repositório, CI e deploy em PaaS",
+    "body": "criar repositório, pipeline de CI e ambiente de homologação com PostgreSQL.\n\nDoD:\n- [ ] pipeline roda testes em todo PR\n- [ ] ambiente de homologação acessível\nRefs: ADR-001, RNF002",
+    "labels": [
+      "devops",
+      "fundacao",
+      "task"
+    ]
+  }
+]

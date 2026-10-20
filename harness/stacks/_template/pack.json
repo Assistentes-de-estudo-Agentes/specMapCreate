@@ -1,0 +1,73 @@
+{
+  "nome": "_template",
+  "descricao": "Copie esta pasta e preencha para criar um novo pack de stack",
+  "revisado_em": "AAAA-MM-DD",
+  "confianca": "baixa",
+  "criterios": [
+    "time_to_market",
+    "custo",
+    "escala",
+    "conhecimento_time",
+    "seguranca",
+    "manutenibilidade",
+    "ecossistema"
+  ],
+  "camadas": {
+    "backend": [
+      {
+        "id": "exemplo",
+        "nome": "Exemplo",
+        "notas": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "pros": "vantagem",
+        "contras": "desvantagem",
+        "nota": "observação opcional",
+        "requer": [
+          {
+            "camada": "banco",
+            "ids": [
+              "postgres"
+            ]
+          }
+        ]
+      }
+    ],
+    "banco": [
+      {
+        "id": "postgres",
+        "nome": "Banco de exemplo (substitua)",
+        "notas": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "pros": "exemplo a substituir",
+        "contras": "não é uma recomendação real",
+        "nota": "Remova ou substitua este exemplo ao criar o pack."
+      }
+    ]
+  },
+  "tasks_fundacao": [
+    {
+      "titulo": "Task de setup típica da stack",
+      "tipo": "devops",
+      "estimativa": 2,
+      "dod": [
+        "critério"
+      ]
+    }
+  ],
+  "nfr_comuns": [],
+  "anti_padroes": []
+}

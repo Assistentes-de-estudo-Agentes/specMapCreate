@@ -1,0 +1,27 @@
+name: Validar especificação SDD
+on:
+  pull_request:
+    paths: ['.sdd/**', 'harness/**']
+  push:
+    branches: [main]
+    paths: ['.sdd/**', 'harness/**']
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Autoteste do harness
+        run: bash harness/scripts/selftest.sh
+      - name: Gate da fase atual do projeto
+        run: |
+          if [ -f .sdd/project.yaml ]; then
+            FASE=$(grep -E '^fase_atual:' .sdd/project.yaml | sed -E 's/fase_atual:[[:space:]]*([0-9]+).*/\1/')
+            GATE=$((FASE - 1))
+            [ "$GATE" -lt 0 ] && GATE=0
+            python3 harness/scripts/run_all.py --gate "$GATE" --sdd .sdd
+          else
+            echo "Sem .sdd/ neste repositório; apenas o autoteste foi executado."
+          fi

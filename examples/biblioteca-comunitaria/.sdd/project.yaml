@@ -1,0 +1,25 @@
+nome: "Biblioteca Comunitária"
+modo: greenfield
+metodologia: scrum
+tamanho: pequeno
+idioma: pt-BR
+fase_atual: 7
+intake_sha256: 93c04fcf3a15df0713d13a56710ec86d78d1b817fb3d6f119c7d5995517d3ace
+equipe:
+  tamanho: 3
+  senioridade: misto
+  stacks_dominadas: [python, postgres]
+  velocidade: 20
+limites:
+  max_tarefa: 5
+stack:
+  backend: django-drf
+  banco: postgres
+  infra: paas
+dor:
+  - Papel, ação e objetivo claros
+  - Critérios de aceite testáveis
+dod_global:
+  - Critérios de aceite atendidos
+  - Testes automatizados passando
+  - Revisão de código realizada

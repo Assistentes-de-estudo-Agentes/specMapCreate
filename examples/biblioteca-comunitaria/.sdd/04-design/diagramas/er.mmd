@@ -1,0 +1,16 @@
+%% refs: US001, US002, US003, RN002
+erDiagram
+    LIVRO ||--o{ EMPRESTIMO : "é emprestado em"
+    SOCIO ||--o{ EMPRESTIMO : "realiza"
+    LIVRO { string codigo PK
+            string titulo
+            string autor
+            string status }
+    SOCIO { int carteirinha PK
+            string nome
+            string telefone }
+    EMPRESTIMO { int id PK
+                 date retirada
+                 date vencimento
+                 date devolucao
+                 decimal multa }

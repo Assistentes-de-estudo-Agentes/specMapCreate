@@ -1,0 +1,16 @@
+%% refs: US003, RN001, RN002
+sequenceDiagram
+    actor B as Bibliotecária
+    participant UI as Interface web
+    participant API as API
+    participant DB as PostgreSQL
+    B->>UI: informa livro e sócio
+    UI->>API: POST /emprestimos
+    API->>DB: conta empréstimos ativos do sócio
+    DB-->>API: total
+    alt total menor que 3 e livro disponível
+        API->>DB: grava empréstimo (vencimento = hoje + 14 dias)
+        API-->>UI: 201 vencimento
+    else limite ou indisponível
+        API-->>UI: 422 motivo
+    end

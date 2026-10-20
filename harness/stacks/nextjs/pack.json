@@ -1,0 +1,559 @@
+{
+ "nome": "nextjs",
+ "descricao": "TypeScript com Next.js (full-stack) ou NestJS",
+ "revisado_em": "2026-10-19",
+ "confianca": "media",
+ "aviso": "Notas 0-5 são julgamento curado, não medição. Verifique versões, suporte e preços antes de decidir.",
+ "criterios": [
+  "time_to_market",
+  "custo",
+  "escala",
+  "conhecimento_time",
+  "seguranca",
+  "manutenibilidade",
+  "ecossistema"
+ ],
+ "camadas": {
+  "backend": [
+   {
+    "id": "nextjs-route-handlers",
+    "nome": "Next.js (route handlers / server actions)",
+    "notas": [
+     5,
+     5,
+     3,
+     5,
+     3,
+     3,
+     5
+    ],
+    "pros": "um repositório, deploy simples",
+    "contras": "regra de negócio complexa acopla com a camada de UI"
+   },
+   {
+    "id": "nestjs",
+    "nome": "NestJS",
+    "notas": [
+     4,
+     5,
+     4,
+     4,
+     4,
+     5,
+     5
+    ],
+    "pros": "estrutura modular e opinativa",
+    "contras": "mais cerimônia para projetos pequenos"
+   }
+  ],
+  "orm": [
+   {
+    "id": "prisma",
+    "nome": "Prisma",
+    "notas": [
+     5,
+     5,
+     3,
+     5,
+     4,
+     4,
+     5
+    ],
+    "pros": "DX excelente, migrações e tipos gerados",
+    "contras": "consultas muito complexas pedem SQL cru"
+   },
+   {
+    "id": "drizzle",
+    "nome": "Drizzle ORM",
+    "notas": [
+     4,
+     5,
+     4,
+     3,
+     4,
+     4,
+     4
+    ],
+    "pros": "leve, próximo do SQL",
+    "contras": "ecossistema menor"
+   }
+  ],
+  "frontend": [
+   {
+    "id": "nextjs-app-router",
+    "nome": "Next.js (App Router)",
+    "notas": [
+     5,
+     5,
+     4,
+     5,
+     4,
+     4,
+     5
+    ],
+    "pros": "SSR/SSG, roteamento e ecossistema",
+    "contras": "complexidade do modelo servidor/cliente",
+    "requer": [
+     {
+      "camada": "backend",
+      "ids": [
+       "nextjs-route-handlers",
+       "nestjs"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "react-vite",
+    "nome": "React + Vite (SPA)",
+    "notas": [
+     4,
+     5,
+     4,
+     5,
+     4,
+     4,
+     5
+    ],
+    "pros": "ecossistema enorme, fácil contratar",
+    "contras": "SEO e carga inicial exigem cuidado"
+   }
+  ],
+  "banco": [
+   {
+    "id": "postgres",
+    "nome": "PostgreSQL",
+    "notas": [
+     4,
+     5,
+     4,
+     4,
+     4,
+     4,
+     5
+    ],
+    "pros": "ACID, JSONB, extensões, maduro",
+    "contras": "exige tuning em escala muito alta"
+   },
+   {
+    "id": "mysql",
+    "nome": "MySQL / MariaDB",
+    "notas": [
+     4,
+     5,
+     4,
+     4,
+     3,
+     4,
+     4
+    ],
+    "pros": "amplamente suportado, simples de operar",
+    "contras": "recursos avançados menos ricos que o Postgres"
+   },
+   {
+    "id": "sqlserver",
+    "nome": "SQL Server",
+    "notas": [
+     3,
+     2,
+     4,
+     3,
+     4,
+     4,
+     4
+    ],
+    "pros": "integração forte com ecossistema Microsoft",
+    "contras": "custo de licenciamento"
+   },
+   {
+    "id": "mongodb",
+    "nome": "MongoDB",
+    "notas": [
+     4,
+     4,
+     4,
+     3,
+     3,
+     3,
+     4
+    ],
+    "pros": "esquema flexível, bom para documentos",
+    "contras": "modelagem relacional e transações multi-documento exigem cuidado",
+    "nota": "pouco aderente a dados fortemente relacionais e transacionais"
+   }
+  ],
+  "cache_mensageria": [
+   {
+    "id": "nenhum",
+    "nome": "Sem cache/fila no início",
+    "notas": [
+     5,
+     5,
+     2,
+     5,
+     4,
+     5,
+     3
+    ],
+    "pros": "menos peças para operar",
+    "contras": "limita escala e processamento assíncrono",
+    "nota": "adequado para MVP pequeno; registre gatilhos para introduzir depois"
+   },
+   {
+    "id": "redis",
+    "nome": "Redis",
+    "notas": [
+     4,
+     4,
+     4,
+     4,
+     3,
+     4,
+     5
+    ],
+    "pros": "cache, filas leves, rate limiting",
+    "contras": "mais uma peça para operar"
+   },
+   {
+    "id": "rabbitmq",
+    "nome": "RabbitMQ",
+    "notas": [
+     3,
+     4,
+     4,
+     3,
+     3,
+     3,
+     4
+    ],
+    "pros": "mensageria clássica, roteamento flexível",
+    "contras": "operação própria; menos adequado a streaming"
+   },
+   {
+    "id": "kafka",
+    "nome": "Apache Kafka",
+    "notas": [
+     2,
+     2,
+     5,
+     2,
+     3,
+     3,
+     5
+    ],
+    "pros": "streaming e alto throughput",
+    "contras": "alto custo operacional e curva de aprendizado",
+    "nota": "raramente justificável para times pequenos ou MVP"
+   }
+  ],
+  "auth": [
+   {
+    "id": "authjs",
+    "nome": "Auth.js",
+    "notas": [
+     5,
+     5,
+     3,
+     4,
+     4,
+     4,
+     4
+    ],
+    "pros": "integração rápida com provedores OAuth",
+    "contras": "fluxos corporativos avançados exigem extras"
+   },
+   {
+    "id": "keycloak",
+    "nome": "Keycloak (OIDC/SAML)",
+    "notas": [
+     3,
+     4,
+     5,
+     3,
+     5,
+     4,
+     4
+    ],
+    "pros": "open source, federação, SSO",
+    "contras": "operação própria"
+   },
+   {
+    "id": "idp-gerenciado",
+    "nome": "Provedor de identidade gerenciado",
+    "notas": [
+     5,
+     2,
+     5,
+     4,
+     5,
+     4,
+     4
+    ],
+    "pros": "segurança e MFA prontos",
+    "contras": "custo por usuário e dependência externa"
+   }
+  ],
+  "infra": [
+   {
+    "id": "paas",
+    "nome": "PaaS gerenciado",
+    "notas": [
+     5,
+     3,
+     3,
+     4,
+     3,
+     4,
+     4
+    ],
+    "pros": "deploy rápido, pouca operação",
+    "contras": "menos controle e custo cresce com escala",
+    "nota": "ex.: Render, Fly.io, Azure App Service"
+   },
+   {
+    "id": "containers-gerenciados",
+    "nome": "Containers gerenciados",
+    "notas": [
+     4,
+     3,
+     4,
+     3,
+     4,
+     4,
+     4
+    ],
+    "pros": "equilíbrio entre controle e operação",
+    "contras": "exige conhecimento de containers e redes",
+    "nota": "ex.: Cloud Run, ECS Fargate, Azure Container Apps"
+   },
+   {
+    "id": "serverless",
+    "nome": "Serverless (funções)",
+    "notas": [
+     4,
+     4,
+     4,
+     3,
+     4,
+     3,
+     4
+    ],
+    "pros": "paga pelo uso, escala automática",
+    "contras": "cold start, limites de execução, acoplamento ao provedor"
+   },
+   {
+    "id": "kubernetes",
+    "nome": "Kubernetes",
+    "notas": [
+     2,
+     2,
+     5,
+     2,
+     4,
+     3,
+     5
+    ],
+    "pros": "controle total e portabilidade",
+    "contras": "overhead operacional alto",
+    "nota": "para times pequenos, prefira containers gerenciados"
+   }
+  ],
+  "cicd": [
+   {
+    "id": "github-actions",
+    "nome": "GitHub Actions",
+    "notas": [
+     5,
+     5,
+     4,
+     5,
+     4,
+     4,
+     5
+    ],
+    "pros": "integrado ao repositório, marketplace amplo",
+    "contras": "minutos limitados em planos gratuitos"
+   },
+   {
+    "id": "gitlab-ci",
+    "nome": "GitLab CI",
+    "notas": [
+     4,
+     4,
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "pros": "pipeline e registry integrados",
+    "contras": "depende de adotar o GitLab"
+   }
+  ],
+  "observabilidade": [
+   {
+    "id": "otel-grafana",
+    "nome": "OpenTelemetry + Grafana stack",
+    "notas": [
+     3,
+     5,
+     4,
+     3,
+     4,
+     4,
+     5
+    ],
+    "pros": "padrão aberto, sem lock-in",
+    "contras": "mais montagem e operação"
+   },
+   {
+    "id": "datadog",
+    "nome": "Plataforma SaaS (ex.: Datadog)",
+    "notas": [
+     5,
+     2,
+     5,
+     3,
+     4,
+     4,
+     5
+    ],
+    "pros": "tudo integrado e rápido de ativar",
+    "contras": "custo elevado em escala"
+   },
+   {
+    "id": "cloud-nativa",
+    "nome": "Ferramentas nativas do provedor",
+    "notas": [
+     5,
+     4,
+     3,
+     4,
+     3,
+     3,
+     3
+    ],
+    "pros": "zero setup extra",
+    "contras": "acoplamento ao provedor"
+   }
+  ],
+  "testes": [
+   {
+    "id": "vitest-playwright",
+    "nome": "Vitest + Playwright",
+    "notas": [
+     5,
+     5,
+     4,
+     5,
+     3,
+     5,
+     5
+    ],
+    "pros": "rápido, integrado ao ecossistema TS",
+    "contras": "E2E exige infraestrutura"
+   }
+  ],
+  "qualidade": [
+   {
+    "id": "eslint-prettier-tsc",
+    "nome": "ESLint + Prettier + tsc estrito",
+    "notas": [
+     5,
+     5,
+     4,
+     5,
+     3,
+     5,
+     5
+    ],
+    "pros": "padrão de mercado",
+    "contras": "configuração inicial"
+   }
+  ]
+ },
+ "tasks_fundacao": [
+  {
+   "titulo": "Criar repositório, convenções de branch e commits",
+   "tipo": "devops",
+   "estimativa": 2,
+   "dod": [
+    "README e guia de contribuição",
+    "proteção de branch principal"
+   ]
+  },
+  {
+   "titulo": "Configurar pipeline de CI (build, lint, testes)",
+   "tipo": "devops",
+   "estimativa": 3,
+   "dod": [
+    "pipeline roda em todo PR",
+    "falha bloqueia merge"
+   ]
+  },
+  {
+   "titulo": "Provisionar ambientes (dev, homologação, produção)",
+   "tipo": "infra",
+   "estimativa": 5,
+   "dod": [
+    "variáveis por ambiente",
+    "acesso documentado"
+   ]
+  },
+  {
+   "titulo": "Gestão de segredos e configuração",
+   "tipo": "seguranca",
+   "estimativa": 2,
+   "dod": [
+    "nenhum segredo no repositório",
+    "rotação documentada"
+   ]
+  },
+  {
+   "titulo": "Logging estruturado e observabilidade básica",
+   "tipo": "devops",
+   "estimativa": 3,
+   "dod": [
+    "logs com correlação de requisição",
+    "painel e alerta mínimos"
+   ]
+  },
+  {
+   "titulo": "Backup e restauração do banco (teste de restore)",
+   "tipo": "infra",
+   "estimativa": 3,
+   "dod": [
+    "RPO/RTO definidos",
+    "restore testado"
+   ]
+  },
+  {
+   "titulo": "Hardening de segurança base (headers, CORS, rate limit)",
+   "tipo": "seguranca",
+   "estimativa": 3,
+   "dod": [
+    "checklist OWASP básico atendido"
+   ]
+  },
+  {
+   "titulo": "Configurar validação de variáveis de ambiente e tipos compartilhados",
+   "tipo": "backend",
+   "estimativa": 2,
+   "dod": [
+    "app falha ao iniciar com env inválido"
+   ]
+  }
+ ],
+ "nfr_comuns": [
+  "Disponibilidade alvo (ex.: 99,5% mensal), definir número",
+  "Tempo de resposta p95 por endpoint crítico, definir ms e carga",
+  "Backup com RPO e RTO definidos",
+  "Segurança alinhada ao OWASP Top 10",
+  "Logs sem dados pessoais em claro (LGPD)"
+ ],
+ "anti_padroes": [
+  "Segredos expostos em variáveis NEXT_PUBLIC_*",
+  "Server actions com regra de negócio extensa sem camada de domínio",
+  "Sem estratégia de cache definida (revalidação)"
+ ]
+}

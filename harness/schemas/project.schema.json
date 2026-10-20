@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SDD project.yaml (documentação do contrato; validação real em validate_state.py)",
+  "type": "object",
+  "required": ["nome", "modo", "metodologia", "tamanho", "idioma", "fase_atual"],
+  "properties": {
+    "nome": {"type": "string"},
+    "modo": {"enum": ["greenfield", "evolucao"]},
+    "metodologia": {"enum": ["scrum", "kanban"]},
+    "tamanho": {"enum": ["pequeno", "medio", "grande", "indefinido"]},
+    "idioma": {"const": "pt-BR"},
+    "fase_atual": {"type": "integer", "minimum": 0, "maximum": 7},
+    "intake_sha256": {"type": ["string", "null"]},
+    "equipe": {"type": "object", "properties": {"tamanho": {"type": "integer"}, "senioridade": {"type": ["string", "null"]}, "stacks_dominadas": {"type": "array"}, "velocidade": {"type": ["number", "null"]}}},
+    "limites": {"type": "object", "properties": {"max_tarefa": {"type": "number"}}},
+    "stack": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}

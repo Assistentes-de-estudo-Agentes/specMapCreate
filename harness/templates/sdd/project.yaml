@@ -1,0 +1,26 @@
+# Configuração do projeto SDD. Valores controlados por validate_state.py
+nome: "{{NOME}}"
+modo: {{MODO}}                 # greenfield | evolucao
+metodologia: {{METODOLOGIA}}   # scrum | kanban
+tamanho: {{TAMANHO}}           # pequeno | medio | grande | indefinido
+idioma: pt-BR
+fase_atual: 0                  # 0 Intake .. 7 Export
+intake_sha256: null
+equipe:
+  tamanho: {{EQUIPE}}
+  senioridade: null            # junior | pleno | senior | misto
+  stacks_dominadas: []
+  velocidade: null             # pontos por sprint (scrum) ou itens por semana (kanban)
+limites:
+  max_tarefa: 5                # scrum: pontos | kanban: dias (use 2)
+stack: {}                      # camada: opcao-escolhida (preenchido na Fase 2)
+dor:
+  - Papel, ação e objetivo claros
+  - Critérios de aceite testáveis (BDD/EARS)
+  - Sem pergunta bloqueante aberta
+  - Dependências identificadas
+dod_global:
+  - Critérios de aceite da task atendidos
+  - Casos de teste automatizados passando
+  - Revisão de código realizada
+  - Documentação atualizada quando aplicável

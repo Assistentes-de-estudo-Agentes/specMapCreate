@@ -1,0 +1,30 @@
+name: Refinamento (pergunta aberta da especificação)
+description: Responder uma pergunta aberta levantada no Discovery
+title: "[Q000] "
+labels: ["refinamento"]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: ID da pergunta
+      placeholder: Q001
+    validations:
+      required: true
+  - type: textarea
+    id: pergunta
+    attributes:
+      label: Pergunta
+    validations:
+      required: true
+  - type: dropdown
+    id: impacto
+    attributes:
+      label: Impacto
+      options: [bloqueante, importante, cosmético]
+    validations:
+      required: true
+  - type: textarea
+    id: resposta
+    attributes:
+      label: Resposta do responsável
+      description: Depois de respondida, rode /sdd-discover --sync.
