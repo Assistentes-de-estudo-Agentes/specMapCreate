@@ -1,97 +1,334 @@
-# SDD Harness
+# 🧭 specMap — Harness de Desenvolvimento Orientado a Especificações
 
-Harness de **Spec-Driven Development** para agentes de IA (ex.: Claude Code). Você descreve o sistema em linguagem livre; o harness conduz, fase a fase e com gates, até um **backlog pronto para Scrum ou Kanban**: épicos, user stories (BDD/EARS), UML, ADRs, tasks, plano de testes, rastreabilidade e export para o quadro.
+> **Transforme uma ideia em uma especificação clara e um backlog organizado antes de começar a programar.**
 
-> Só especificação. **Nenhum código de aplicação é gerado.** Idioma da saída: português (pt-BR).
+O **specMap** é um harness de **Spec-Driven Development (SDD)** que orienta agentes de IA, etapa por etapa, na descoberta, definição e validação de um projeto de software.
 
-## Instalação
+Você descreve o sistema em linguagem natural. O harness ajuda a organizar as informações e produzir requisitos, decisões técnicas, diagramas, tarefas, plano de testes e arquivos que podem apoiar a importação do backlog em ferramentas de gestão.
+
+**Importante:** o objetivo deste projeto é produzir **especificações e planejamento**, não implementar o código da aplicação. A IA propõe; **as decisões e aprovações finais continuam sendo suas**.
+
+---
+
+## ✨ O que você consegue fazer com o specMap?
+
+- 🗣️ **Começar com uma ideia em linguagem natural**, mesmo que ela ainda esteja incompleta.
+- 🔎 **Descobrir o que falta decidir**, registrando dúvidas, suposições e riscos.
+- 🧰 **Comparar tecnologias por camada** e registrar escolhas técnicas em ADRs.
+- 📝 **Organizar requisitos**, regras de negócio, histórias de usuário e critérios de aceitação.
+- 🧩 **Descrever a solução** com diagramas UML/Mermaid, modelo de dados e contratos de API.
+- 🗂️ **Dividir o trabalho em tarefas** adequadas a Scrum ou Kanban.
+- ✅ **Validar consistência e rastreabilidade** entre requisitos, tarefas e testes.
+- 📦 **Gerar artefatos de backlog** em formatos que podem ser adaptados para Jira, Linear, Trello, GitHub Issues e CSV.
+- 📚 **Gerar documentação final** em Markdown, HTML e PDF.
+
+## 🧠 Como funciona o fluxo?
+
+O specMap avança por fases. Cada etapa produz documentos que alimentam as seguintes.
+
+| Fase | O que acontece | Principais resultados |
+|---|---|---|
+| **0. Intake** | Registra seu pedido original, sem alterá-lo. | Descrição inicial do projeto |
+| **1. Discovery** | Identifica usuários, objetivos, limites, riscos, suposições e dúvidas. | Contexto, perguntas abertas e avaliação de suficiência |
+| **2. Stack** | Compara tecnologias e registra decisões. | Recomendações por camada e ADRs |
+| **3. Requisitos** | Define funcionalidades e regras do sistema. | Épicos, histórias de usuário, critérios de aceitação, RN e RNF |
+| **4. Design** | Organiza a solução e suas interfaces. | Diagramas, modelo de dados e contratos de API |
+| **5. Planejamento** | Divide o escopo em trabalho executável. | Tarefas, dependências, riscos e plano Scrum/Kanban |
+| **6. Qualidade** | Revisa a especificação e planeja a verificação. | Plano de testes, rastreabilidade e revisão independente |
+| **7. Export** | Organiza os resultados para uso em ferramentas de gestão. | Backlog estruturado, CSV e JSON |
+| **Opcional. Docs** | Reúne os artefatos em documentação de consulta. | Especificação, casos de uso, diagramas, HTML e PDF |
+
+### O que é um *gate*?
+
+Um **gate** é um ponto de verificação. Ao concluir uma fase, os validadores verificam regras estruturais e consistência dos arquivos. O agente apresenta o resultado e solicita sua aprovação antes de avançar.
+
+Passar na validação automática **não garante, por si só, que a especificação esteja correta**. Leia os documentos e confirme se eles refletem o que você deseja construir.
+
+---
+
+## 🚀 Comece em poucos passos
+
+### 1. Prepare o ambiente
+
+Você precisará de:
+
+- **Python 3.9 ou superior** para executar os scripts de validação. O harness não exige bibliotecas Python externas para seu uso básico.
+- **Claude Code**, para o fluxo de comandos `/sdd-*` disponibilizado pelo projeto. O uso em outro agente depende de ele conseguir ler e seguir as instruções compatíveis.
+- **Git** é recomendado para acompanhar as alterações e recuperar versões anteriores.
+
+Confira a versão do Python no terminal:
+
 ```bash
-git clone <este-repositorio> && cd sdd-harness
-./install.sh /caminho/do/seu-projeto      # copia skills, subagentes, scripts, templates e CI
-```
-Ou use este repositório diretamente como *template repository* e abra o agente na raiz. Requer **Python 3.9+** (sem dependências). Opcional: `npm i -g @mermaid-js/mermaid-cli` para validar sintaxe Mermaid completa.
-
-## Uso rápido
-```
-/sdd-init                      # nome, modo (greenfield/evolução), Scrum/Kanban, perfil da equipe
-/sdd-intake <seu prompt livre> # texto bruto, imutável (pode ser transcrição de voz)
-/sdd-discover                  # atores, escopo, suposições, perguntas, tamanho
-/sdd-stack                     # escolha guiada camada por camada, com recomendação e ADRs
-/sdd-spec                      # épicos, US, AC em BDD/EARS, RN, RNF
-/sdd-design                    # UML (Mermaid), modelo de dados, contratos de API
-/sdd-plan                      # tasks atômicas, spikes, riscos, plano Scrum ou Kanban
-/sdd-quality                   # plano de testes, rastreabilidade, revisão independente
-/sdd-export                    # Jira, Linear, Trello, GitHub Issues, CSV
-/sdd-docs                      # documento final: especificação, casos de uso e UML em Markdown, HTML e PDF
-```
-Atalho: `/sdd-run "descrição do sistema"` executa tudo, parando em cada gate.
-Sistema existente: `/sdd-adopt` (baseline) e `/sdd-evolve` (mudança como delta). Outros: `/sdd-status`, `/sdd-back <fase>`.
-
-## Fluxo e gates
-| Fase | Skill | Saída principal | Gate mecânico |
-|---|---|---|---|
-| 0 | `sdd-intake` | `00-intake/raw.md` + hash | integridade do hash |
-| 1 | `sdd-discover` | contexto, suposições, perguntas, tamanho | sem pergunta bloqueante |
-| 2 | `sdd-stack` | ADRs, `project.yaml#stack` | ADR por camada, aprovados |
-| 3 | `sdd-spec` | `spec.md` | `validate_spec`, `lint_language`, `check_sizing` |
-| 4 | `sdd-design` | `.mmd`, dados, contratos, `design.md` | `validate_diagrams` |
-| 5 | `sdd-plan` | `tasks.md`, riscos, plano | `validate_tasks`, `graph_deps` |
-| 6 | `sdd-quality` | testes, rastreabilidade, revisão | `validate_traceability` + revisor independente |
-| 7 | `sdd-export` | `backlog.json` + CSV/JSON | `validate_export` |
-
-Gate N = fase N concluída (`--gate 0` valida só a estrutura). Rodar manualmente: `python3 harness/scripts/run_all.py --gate 3`. O gate 1 exige o Discovery suficiente e aprovado (`01-discovery/suficiencia.md`). Os gates 2–7 também validam os packs tecnológicos. Para avaliar os próprios comportamentos de IA, consulte `evals/README.md`; o autoteste mecânico não prova sozinho a qualidade semântica.
-
-## Estrutura do repositório
-```
-.claude/skills/sdd-*/        14 skills (uma por fase + adopt, evolve, status, back, run) e references/
-.claude/agents/              spec-reviewer, ambiguity-adversary, stack-analyst, legacy-analyst
-harness/scripts/             validadores, rastreabilidade, rank_stack/validate_stacks, status, export, init_project, selftest
-harness/templates/sdd/       arquivos iniciais do .sdd/
-harness/templates/evolucao/  templates do modo evolução (legado/, mudancas/)
-harness/templates/extras/    ADR e documento de refinamento
-harness/stacks/              packs de stack: django, nextjs, spring-boot, dotnet, _template
-harness/schemas/             contratos JSON (backlog, project)
-evals/                         cenários adversariais e rubrica de qualidade do harness
-examples/biblioteca-comunitaria/   projeto de exemplo completo (passa no gate 7)
-docs/ARQUITETURA.md          desenho e justificativas
-.github/                     CI de validação, template de PR, issue de refinamento
+python3 --version
 ```
 
-## Estrutura gerada no projeto (`.sdd/`)
-`project.yaml` · `STATE.md` · `LESSONS.md` · `GLOSSARIO.md` · `00-intake/` · `01-discovery/` · `02-stack/(adr/)` · `03-requisitos/` · `04-design/(diagramas/)` · `05-planejamento/` · `06-qualidade/` · `07-export/` · `legado/` e `mudancas/` (só no modo evolução).
+No Windows, caso `python3` não esteja disponível, tente:
 
-## Scripts
-| Script | Função |
+```powershell
+python --version
+```
+
+### 2. Coloque o specMap no computador
+
+Baixe ou clone este repositório e extraia os arquivos, se necessário. Abra a **pasta raiz do specMap** na ferramenta de IA — a pasta que contém `AGENTS.md`, `CLAUDE.md`, `harness/` e `.claude/`.
+
+Se estiver clonando do GitHub, use o endereço real do repositório no lugar de `<URL-DO-REPOSITORIO>`:
+
+```bash
+git clone <URL-DO-REPOSITORIO>
+cd specMap
+```
+
+> **Dica:** não abra apenas a pasta `harness/` ou `.claude/`. A ferramenta precisa enxergar a estrutura completa para seguir o fluxo corretamente.
+
+### 3. Inicie seu projeto
+
+Com a pasta raiz aberta na ferramenta compatível, comece com:
+
+```text
+/sdd-init
+```
+
+O agente deve ajudar a definir as informações iniciais:
+
+- nome do projeto;
+- tipo: sistema novo (`greenfield`) ou evolução de um sistema existente (`evolucao`);
+- metodologia: Scrum ou Kanban;
+- tamanho e perfil da equipe.
+
+O comando cria a estrutura de trabalho em `.sdd/`. Se essa pasta já existir, não a sobrescreva sem entender o que já foi produzido.
+
+### 4. Descreva sua ideia
+
+Depois da inicialização, registre o pedido original com:
+
+```text
+/sdd-intake Quero criar um sistema para [descreva sua ideia em linguagem natural].
+```
+
+Não precisa escrever como um especialista. Explique qual problema deseja resolver, quem usará o sistema e o que espera alcançar. Você também pode descrever a ideia em texto livre.
+
+### 5. Siga as etapas
+
+Para um projeto novo, o caminho recomendado é:
+
+```text
+/sdd-discover
+/sdd-stack
+/sdd-spec
+/sdd-design
+/sdd-plan
+/sdd-quality
+/sdd-export
+/sdd-docs
+```
+
+Execute **uma etapa por vez** e leia os documentos gerados. `/sdd-docs` é opcional e serve para reunir os artefatos em uma documentação final.
+
+### ⚡ Quer começar com uma única solicitação?
+
+Você também pode pedir ao agente para conduzir o fluxo completo:
+
+```text
+/sdd-run "Quero criar um sistema para [descreva sua ideia]."
+```
+
+O comando orquestra as etapas em ordem, mas **não deve pular os gates**: vai parar para apresentar verificações, tirar dúvidas bloqueantes e solicitar aprovações humanas.
+
+---
+
+## 📂 Onde ficam os arquivos?
+
+### Arquivos do harness
+
+| Caminho | O que contém |
 |---|---|
-| `validate_spec.py` | IDs, US, AC em BDD/EARS, RN/RNF, origem obrigatória |
-| `lint_language.py` | termos vagos, "e/ou", voz passiva |
-| `validate_tasks.py` | refs existentes, DoD, estimativa e limite por metodologia |
-| `graph_deps.py` | ciclos e caminho crítico |
-| `validate_traceability.py` | AC↔task↔teste; `--write` gera a matriz |
-| `validate_diagrams.py` | tipo, `%% refs`, delimitadores; `mmdc` se instalado |
-| `validate_discovery.py` | suficiência do Discovery: 9 domínios com evidência, registro de conhecimento tipado, lacunas aceitas com responsável, aprovação vinculada ao hash do intake |
-| `validate_state.py` | `project.yaml`, perguntas bloqueantes, ADRs, hash do intake |
-| `validate_stale.py` / `stamp.py` | obsolescência por hash de insumos |
-| `check_sizing.py` | limites por tamanho (pequeno/médio/grande) |
-| `rank_stack.py` | ranking transparente por camada a partir dos packs, com validação prévia e limites de pesos |
-| `validate_stacks.py` | valida campos, notas, IDs e referências de compatibilidade dos packs |
-| `export/build_backlog.py` · `export/convert.py` | backlog canônico → jira, linear, trello, github, csv |
-| `build_docs.py` | documentação final: `especificacao.md`, `casos-de-uso.md`, `diagramas.md`, HTML e PDF (Mermaid via `mmdc` + Chrome) |
-| `status.py` · `lessons.py` · `init_project.py` | estado/fase, lições, scaffold |
-| `selftest.sh` | autoteste usado na CI |
+| `AGENTS.md` | Regras centrais e fluxo de trabalho para o agente |
+| `CLAUDE.md` | Arquivo de referência para o ambiente Claude |
+| `.claude/skills/` | Instruções das etapas `/sdd-*` |
+| `.claude/agents/` | Agentes auxiliares para revisão, ambiguidade, stack e sistemas legados |
+| `harness/scripts/` | Scripts de inicialização, status, validação, exportação e documentação |
+| `harness/templates/` | Modelos usados para criar os documentos do projeto |
+| `harness/stacks/` | Packs de referência para Django, Next.js, Spring Boot e .NET, além de um modelo |
+| `harness/schemas/` | Esquemas para validar arquivos estruturados |
+| `examples/biblioteca-comunitaria/` | Exemplo preenchido de um projeto, útil para aprender pelo modelo |
+| `evals/` | Cenários para avaliar o comportamento e a robustez do harness |
+| `docs/ARQUITETURA.md` | Detalhes técnicos sobre a arquitetura e as decisões do próprio harness |
 
-Os validadores de artefatos aceitam `--sdd <pasta>` e `--json`; `validate_stacks.py` aceita `--pack`/`--arquivo`, e `rank_stack.py` usa `--pack`. Código de saída ≠ 0 quando há erro.
+### Arquivos gerados para o seu projeto
 
-## Convenções de formato (lidas pelos scripts)
-US `### US001: título`, campos `- **Campo:** valor` (um por linha), AC `**AC001.1 (BDD|EARS)**`, regras `**RN001**: ...`, tasks `### TSK001: ...`, casos `### CT001.1.1: ...`. Templates e exemplo mostram o formato exato; blocos HTML `<!-- -->` e cercas de código são ignorados pelos parsers.
+Os artefatos ficam normalmente em **`.sdd/`**. Entre eles:
 
-## Adicionar uma stack
-Copie `harness/stacks/_template/`, preencha o `pack.json`, valide com `python3 harness/scripts/validate_stacks.py --pack <nome>` e só então use `rank_stack.py --pack <nome>`. Veja `harness/stacks/README.md`. Sem pack, o agente analisa em modo genérico e marca confiança baixa.
+- `project.yaml`: configuração do projeto, metodologia, tamanho e fase atual;
+- `STATE.md`: estado e histórico do fluxo;
+- `LESSONS.md`: aprendizados registrados durante o trabalho;
+- `GLOSSARIO.md`: termos importantes do domínio;
+- `00-intake/`: pedido original;
+- `01-discovery/`: contexto, suposições, perguntas abertas e suficiência;
+- `02-stack/`: análise da stack e registros de decisão (ADRs);
+- `03-requisitos/`: especificação de requisitos;
+- `04-design/`: design, diagramas, dados e contratos;
+- `05-planejamento/`: tarefas, dependências, metodologia e riscos;
+- `06-qualidade/`: testes, revisão e rastreabilidade;
+- `07-export/`: backlog e arquivos exportáveis;
+- `08-docs/`: documentação consolidada, quando gerada.
 
-## Limitações conhecidas
-- A suficiência do Discovery é verificada em **forma e referências** (campos, IDs, aprovação, hash do intake); a qualidade das respostas continua dependendo do agente e da revisão humana.
-- Mermaid: sem `mmdc` a validação é estrutural.
-- As notas dos packs são julgamento curado, não medição: confirme versões e suporte em fontes oficiais antes de decidir. A data de revisão do pack não prova verificação atual.
-- O parser de YAML é um subconjunto próprio (mapas, listas simples, `[a, b]`); mantenha `project.yaml` simples.
-- Skills e subagentes são instruções para o agente: a garantia "somente leitura" dos revisores depende das ferramentas concedidas e das regras do prompt.
-- Os conversores de export geram arquivos de partida; ajuste o mapeamento de colunas conforme a configuração do seu Jira/Linear/Trello. Isso não é integração com APIs nem cria itens remotamente.
+Os diretórios e arquivos específicos podem variar conforme o modo do projeto e as etapas concluídas.
+
+---
+
+## 🧭 Comandos de consulta e recuperação
+
+Esses comandos são úteis depois que o projeto já começou:
+
+| Comando | Quando usar |
+|---|---|
+| `/sdd-status` | Para saber a fase atual, o que falta e qual é o próximo passo |
+| `/sdd-back <fase>` | Para voltar a uma fase anterior e revisar decisões. Informe o motivo quando solicitado |
+| `/sdd-adopt` | Para registrar a situação atual de um sistema existente antes de planejar mudanças |
+| `/sdd-evolve` | Para especificar uma mudança em um sistema existente, identificando o que será alterado |
+| `/sdd-run "descrição"` | Para orquestrar o fluxo completo, respeitando os gates |
+
+### Qual fluxo devo escolher?
+
+- **Vou criar um sistema do zero:** use `/sdd-init` e depois `/sdd-intake`.
+- **Já tenho um sistema e quero evoluí-lo:** inicialize em modo `evolucao`; em seguida, use `/sdd-adopt` para documentar a situação atual antes de especificar a mudança.
+- **Não sei em que etapa parei:** use `/sdd-status`.
+- **Mudei de ideia sobre uma decisão importante:** discuta o impacto com o agente e, se necessário, volte à fase adequada com `/sdd-back`.
+
+---
+
+## ✅ Executar as validações manualmente
+
+Execute os comandos a seguir a partir da raiz do projeto que contém a pasta `harness/` e os artefatos `.sdd/`.
+
+Validar a estrutura inicial:
+
+```bash
+python3 harness/scripts/run_all.py --gate 0
+```
+
+Validar até uma etapa específica, por exemplo, a fase de requisitos:
+
+```bash
+python3 harness/scripts/run_all.py --gate 3
+```
+
+O número do gate vai de `0` a `7`. Cada gate inclui verificações cumulativas necessárias até aquela fase; por isso, erros anteriores também podem aparecer.
+
+Consultar o estado resumido:
+
+```bash
+python3 harness/scripts/status.py
+```
+
+Validar os packs de stack:
+
+```bash
+python3 harness/scripts/validate_stacks.py
+```
+
+Executar o autoteste do harness em ambientes com Bash:
+
+```bash
+bash harness/scripts/selftest.sh
+```
+
+> No Windows, esses exemplos usam `python3` e Bash. Se necessário, use `python` no lugar de `python3` e execute scripts `.sh` pelo Git Bash ou WSL.
+
+### O que fazer se uma validação falhar?
+
+1. Leia a mensagem completa, incluindo o nome do arquivo e o tipo de erro.
+2. Peça ao agente para explicar a falha em linguagem simples.
+3. Corrija os documentos relacionados sem apagar decisões aprovadas sem necessidade.
+4. Rode novamente o gate correspondente.
+5. Revise se a mudança deixou outros artefatos desatualizados (*stale*).
+
+Não ignore um erro só para avançar de fase. O objetivo dos validadores é encontrar inconsistências antes que se propaguem para os próximos documentos.
+
+---
+
+## 🧱 Instalar o harness em outro projeto
+
+Você não precisa usar o repositório do specMap como pasta de trabalho. Também pode instalar o harness dentro de um projeto existente.
+
+No Linux, macOS, Git Bash ou WSL, execute a partir da pasta do specMap:
+
+```bash
+./install.sh "/caminho/para/seu-projeto"
+```
+
+Substitua o caminho pelo diretório raiz do projeto que receberá o harness. O instalador copia as skills, os agentes auxiliares, os scripts, os templates, os exemplos, as avaliações e os arquivos de apoio do GitHub Actions. Ele preserva `AGENTS.md` e `CLAUDE.md` existentes, com os ajustes previstos no script.
+
+Depois da instalação:
+
+1. Abra a pasta do projeto de destino na ferramenta de IA.
+2. Confira o `AGENTS.md` e as instruções do projeto.
+3. Execute `/sdd-init` para criar os artefatos `.sdd/`.
+4. Continue pelo fluxo recomendado.
+
+**Atenção:** faça backup ou use Git antes de instalar em um projeto existente. Revise as alterações de arquivos antes de incorporá-las ao seu repositório.
+
+---
+
+## 🧰 Packs de stack
+
+O harness inclui packs de referência para:
+
+- Django;
+- Next.js;
+- Spring Boot;
+- .NET;
+- um `_template` para criar packs personalizados.
+
+Os packs ajudam a organizar opções por camada e comparar critérios como custo, manutenção, segurança, escala, ecossistema e familiaridade da equipe. As pontuações são avaliações de referência, **não uma verdade objetiva**. Confirme versões, compatibilidade, licenciamento e suporte nas fontes oficiais atuais antes de decidir.
+
+Para consultar a documentação dos packs, veja [`harness/stacks/README.md`](harness/stacks/README.md).
+
+---
+
+## 📤 Sobre exportação e integrações
+
+A fase `/sdd-export` gera arquivos estruturados que podem ser ajustados para ferramentas como Jira, Linear, Trello, GitHub Issues e CSV.
+
+Isso **não significa que o specMap cria automaticamente itens em serviços externos**. Os arquivos gerados são um ponto de partida; o mapeamento e a importação dependem da configuração da ferramenta de destino. Revise os campos antes de importar.
+
+---
+
+## ⚠️ Limitações importantes
+
+- O harness não gera o código da aplicação: ele prepara a especificação, o planejamento e os artefatos relacionados.
+- A validação automática verifica estrutura, referências e regras definidas nos scripts. Ela não consegue garantir sozinha que todas as decisões de negócio estejam corretas.
+- A qualidade das sugestões depende das informações fornecidas, do agente utilizado e da revisão humana.
+- A recomendação de stack não substitui a verificação atual da documentação oficial das tecnologias.
+- Sem o Mermaid CLI (`mmdc`), a validação de diagramas é principalmente estrutural. A renderização completa e a geração de PDF podem exigir ferramentas adicionais, como Mermaid CLI e Chrome.
+- Os arquivos exportados não criam registros remotamente por conta própria.
+
+---
+
+## 🤝 Como contribuir
+
+Contribuições, correções e sugestões são bem-vindas. Antes de enviar uma mudança:
+
+1. Explique o problema ou a melhoria proposta.
+2. Atualize as instruções ou os testes pertinentes.
+3. Execute os validadores ou o autoteste aplicável.
+4. Revise o diff para garantir que não incluiu arquivos gerados ou alterações não relacionadas.
+5. Abra um Pull Request com o contexto, o motivo da mudança e como ela foi verificada.
+
+O repositório inclui um modelo de Pull Request em `.github/pull_request_template.md` e um fluxo de validação em `.github/workflows/validate-spec.yml`.
+
+---
+
+## 📚 Documentação adicional
+
+- [Arquitetura do specMap](docs/ARQUITETURA.md)
+- [Exemplo completo: Biblioteca Comunitária](examples/biblioteca-comunitaria/)
+- [Instruções dos packs de stack](harness/stacks/README.md)
+- [Cenários de avaliação do harness](evals/README.md)
+
+---
+
+<p align="center">
+  <strong>specMap</strong> · Clareza antes do código. Decisões explícitas. Qualidade verificável.
+</p>
