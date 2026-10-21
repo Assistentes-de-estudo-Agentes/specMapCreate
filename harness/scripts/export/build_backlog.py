@@ -3,6 +3,7 @@
 import datetime
 import json
 import sys
+import subprocess
 
 try:
     import yaml
@@ -88,6 +89,11 @@ def main():
         # JSON é subconjunto válido de YAML 1.2 e mantém os dados sem dependências extras.
         ydest.write_text(serialized + "\n", encoding="utf-8")
     print(f"backlog gerado: {dest} e {ydest} ({sum(len(e['historias']) for e in epicos)} US, {len(tasks)} tasks)")
+    # Exportações de compatibilidade para o programa SoftTracker ficam na raiz do projeto.
+    softtracker_script = Path(__file__).resolve().parent / "build_softtracker.py"
+    project_root = sdd.parent
+    subprocess.run([sys.executable, str(softtracker_script), "--sdd", str(sdd),
+                    "--saida", str(project_root / "softtracker")], check=True)
 
 
 if __name__ == "__main__":

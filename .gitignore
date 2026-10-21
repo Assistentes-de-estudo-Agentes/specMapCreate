@@ -1,5 +1,3 @@
 __pycache__/
 *.pyc
 .DS_Store
-.sdd/07-export/*.csv
-.sdd/07-export/github-issues.sh

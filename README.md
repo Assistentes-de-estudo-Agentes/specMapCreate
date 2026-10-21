@@ -332,3 +332,19 @@ O repositório inclui um modelo de Pull Request em `.github/pull_request_templat
 <p align="center">
   <strong>specMap</strong> · Clareza antes do código. Decisões explícitas. Qualidade verificável.
 </p>
+
+### Exportar arquivos para o SoftTracker
+
+Ao concluir o Gate 7 com todos os validadores aprovados, o fluxo gera automaticamente os artefatos de exportação: `backlog.json`, `backlog.yml` e os dois arquivos para integração com o SoftTracker na pasta `softtracker/` da raiz do projeto (`spec.yaml` e `especificacao.yml`). A exportação é feita a partir dos documentos reais de `.sdd`, não de arquivos de exemplo.
+
+Os dois YAMLs são **formatos alternativos da mesma especificação**. Para inicializar o SoftTracker, passe apenas um deles por vez em `--spec` (recomendado: `spec.yaml`). Não passe os dois juntos: ambos representam os mesmos casos de uso e tarefas, então isso duplicaria os IDs no grafo do SoftTracker. `especificacao.yml` mantém também os campos de requisitos legados para consumidores que usam esse formato.
+
+Critérios derivados de descrições textuais não recebem nomes inventados de classes, funções ou rotas. Eles são marcados para análise semântica pelo SoftTracker; por isso, a validação pode exibir avisos sobre ausência de artefato determinístico, mas não deve falhar por tipo de artefato inválido.
+
+Para gerar apenas os dois arquivos do SoftTracker manualmente:
+
+```bash
+python harness/scripts/export/build_softtracker.py --sdd .sdd --saida softtracker
+```
+
+Os arquivos são derivados dos documentos do `.sdd`; edite as fontes e regenere as exportações em vez de alterar os YAMLs manualmente. Se algum validador do Gate 7 falhar, a exportação final não é executada até que os problemas sejam corrigidos.

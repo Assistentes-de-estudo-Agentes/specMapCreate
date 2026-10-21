@@ -12,7 +12,7 @@ GATES = {
     4: ["validate_state", "validate_discovery", "validate_stacks", "validate_spec", "lint_language", "check_sizing", "validate_diagrams", "validate_stale"],
     5: ["validate_state", "validate_discovery", "validate_stacks", "validate_spec", "validate_tasks", "graph_deps", "lint_language", "validate_diagrams", "validate_stale"],
     6: ["validate_state", "validate_discovery", "validate_stacks", "validate_spec", "validate_tasks", "graph_deps", "validate_diagrams", "validate_traceability", "validate_stale"],
-    7: ["validate_state", "validate_discovery", "validate_stacks", "validate_spec", "validate_tasks", "graph_deps", "validate_diagrams", "validate_traceability", "validate_stale", "validate_export"],
+    7: ["validate_state", "validate_discovery", "validate_stacks", "validate_spec", "validate_tasks", "graph_deps", "validate_diagrams", "validate_traceability", "validate_stale"],
 }
 
 
@@ -32,7 +32,20 @@ def main():
             cmd += ["--gate", str(a.gate)]
         p = subprocess.run(cmd)
         rc |= p.returncode
-    print("\n>>> GATE", a.gate, "APROVADO pelos validadores" if rc == 0 else "REPROVADO: corrija os erros acima")
+
+    # O Gate 7 é o encerramento do fluxo: só exporta artefatos quando todos
+    # os validadores anteriores passam. build_backlog também gera os dois
+    # contratos YAML do SoftTracker na raiz do projeto.
+    if a.gate == 7 and rc == 0:
+        export_cmd = [sys.executable, str(here / "export" / "build_backlog.py"), "--sdd", a.sdd]
+        export_result = subprocess.run(export_cmd)
+        rc |= export_result.returncode
+        if export_result.returncode == 0:
+            validate_cmd = [sys.executable, str(here / "validate_export.py"), "--sdd", a.sdd]
+            validate_result = subprocess.run(validate_cmd)
+            rc |= validate_result.returncode
+
+    print("\n>>> GATE", a.gate, "APROVADO pelos validadores e exportações" if rc == 0 and a.gate == 7 else ("APROVADO pelos validadores" if rc == 0 else "REPROVADO: corrija os erros acima"))
     return rc
 
 

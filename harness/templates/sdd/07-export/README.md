@@ -19,3 +19,18 @@ python harness/scripts/export/convert.py --alvo github
 ```
 
 O último comando apenas gera os arquivos locais. Para criar issues remotas, é necessária autenticação do GitHub CLI e execução consciente do script `github-issues.sh`.
+
+## SoftTracker (integração externa)
+
+Ao executar `build_backlog.py`, o specMap também gera, na raiz do projeto, a pasta `softtracker/` com dois contratos YAML:
+
+- `softtracker/spec.yaml`: formato compacto com stack, requisitos disponíveis, casos de uso, referências UML encontradas e tasks com critérios.
+- `softtracker/especificacao.yml`: formato detalhado com RF, RNF, regras de negócio, histórias/casos de uso, tasks, critérios de aceite e ordem de implementação.
+
+Os arquivos são derivados de `project.yaml`, `03-requisitos/spec.md`, `04-design/design.md` e `05-planejamento/tasks.md`. Não edite os arquivos gerados como fonte de verdade. Para gerá-los separadamente:
+
+```bash
+python harness/scripts/export/build_softtracker.py --sdd .sdd --saida softtracker
+```
+
+Quando a fonte não declara RF, RNF, status ou classes UML, o exportador não inventa esses dados; campos ausentes permanecem vazios ou como `nao_especificado`.

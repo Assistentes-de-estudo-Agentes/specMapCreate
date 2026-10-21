@@ -1,0 +1,392 @@
+projeto:
+  nome: Biblioteca Comunitária
+  descricao: ''
+  objetivo: ''
+  stack:
+    backend: django-drf
+    banco: postgres
+    infra: paas
+requisitos_funcionais: []
+requisitos_nao_funcionais:
+- id: RNF001
+  descricao: A consulta do sócio deve carregar em menos de 2 segundos no p95 em conexão 4G.
+- id: RNF002
+  descricao: O acesso à área da bibliotecária exige autenticação com senha de no mínimo 10 caracteres.
+regras_de_negocio:
+- id: RN001
+  descricao: O prazo de empréstimo é de 14 dias corridos.
+- id: RN002
+  descricao: Cada sócio pode ter no máximo 3 empréstimos ativos.
+- id: RN003
+  descricao: A multa é de R$ 0,50 por dia corrido de atraso, sem teto.
+casos_de_uso:
+- id: UC001
+  nome: Cadastrar livro
+  historia_id: US001
+  ator: bibliotecária
+  requisitos:
+  - RNF002
+  historia: Como bibliotecária, quero cadastrar livros no acervo para controlar quais títulos estão disponíveis.
+  prioridade: Must
+  mvp: sim
+  criterios_aceitacao:
+  - id: AC001.1
+    tipo: BDD
+    descricao: Dado que a bibliotecária está autenticada Quando informa título, autor e código do livro e confirma
+      Então o livro aparece na lista do acervo com status "disponível"
+  - id: AC001.2
+    tipo: EARS
+    descricao: Se o código informado já existir no acervo, então o sistema deve recusar o cadastro e exibir a mensagem
+      "Código já cadastrado".
+- id: UC002
+  nome: Cadastrar sócio
+  historia_id: US002
+  ator: bibliotecária
+  requisitos: []
+  historia: Como bibliotecária, quero cadastrar sócios para registrar quem pode pegar livros emprestados.
+  prioridade: Must
+  mvp: sim
+  criterios_aceitacao:
+  - id: AC002.1
+    tipo: BDD
+    descricao: Dado que a bibliotecária está autenticada Quando informa nome e telefone do sócio e confirma Então
+      o sistema gera um número de carteirinha único e exibe o sócio como "ativo"
+- id: UC003
+  nome: Registrar empréstimo
+  historia_id: US003
+  ator: bibliotecária
+  requisitos: []
+  historia: Como bibliotecária, quero registrar o empréstimo de um livro a um sócio para controlar prazos e disponibilidade.
+  prioridade: Must
+  mvp: sim
+  criterios_aceitacao:
+  - id: AC003.1
+    tipo: BDD
+    descricao: Dado que o livro está disponível e o sócio possui menos de 3 empréstimos ativos Quando a bibliotecária
+      registra o empréstimo Então o livro passa a "emprestado" e a data de vencimento é a data atual mais 14 dias
+  - id: AC003.2
+    tipo: EARS
+    descricao: Se o sócio já possuir 3 empréstimos ativos, então o sistema deve impedir o novo empréstimo e informar
+      o limite.
+  - id: AC003.3
+    tipo: EARS
+    descricao: Se o livro estiver com status "emprestado", então o sistema deve impedir o empréstimo e informar
+      a data prevista de devolução.
+- id: UC004
+  nome: Registrar devolução com multa
+  historia_id: US004
+  ator: bibliotecária
+  requisitos: []
+  historia: Como bibliotecária, quero registrar a devolução e calcular a multa de atraso para liberar o livro e
+    cobrar o valor devido.
+  prioridade: Must
+  mvp: sim
+  criterios_aceitacao:
+  - id: AC004.1
+    tipo: BDD
+    descricao: Dado que existe um empréstimo ativo vencido há 4 dias Quando a bibliotecária registra a devolução
+      Então o livro volta a "disponível" e o sistema exibe multa de R$ 2,00
+  - id: AC004.2
+    tipo: EARS
+    descricao: Quando a devolução ocorrer até a data de vencimento, o sistema deve concluir a devolução sem multa.
+- id: UC005
+  nome: Consultar meus empréstimos
+  historia_id: US005
+  ator: sócio
+  requisitos:
+  - RNF001
+  historia: Como sócio, quero consultar meus empréstimos e vencimentos pelo celular para devolver os livros no prazo.
+  prioridade: Should
+  mvp: não
+  criterios_aceitacao:
+  - id: AC005.1
+    tipo: BDD
+    descricao: Dado que o sócio informa seu número de carteirinha Quando abre a consulta Então vê a lista de livros
+      emprestados com a data de vencimento de cada um
+tarefas_desenvolvimento:
+- id: TSK001
+  descricao: Preparar repositório, CI e deploy em PaaS
+  detalhes: criar repositório, pipeline de CI e ambiente de homologação com PostgreSQL.
+  relacionado_a: []
+  status: nao_especificado
+- id: TSK002
+  descricao: Modelar e migrar tabelas livro, sócio e empréstimo
+  detalhes: criar entidades conforme er.mmd e migrações.
+  relacionado_a:
+  - UC001
+  status: nao_especificado
+- id: TSK004
+  descricao: Autenticação da bibliotecária
+  detalhes: login com política de senha de 10 caracteres ou mais.
+  relacionado_a:
+  - UC001
+  status: nao_especificado
+- id: TSK003
+  descricao: API de cadastro de livros
+  detalhes: endpoint de criação e listagem com validação de código duplicado.
+  relacionado_a:
+  - UC001
+  status: nao_especificado
+- id: TSK005
+  descricao: API de cadastro de sócios
+  detalhes: criação de sócio com geração de número de carteirinha único.
+  relacionado_a:
+  - UC002
+  status: nao_especificado
+- id: TSK006
+  descricao: API de empréstimo com regras de prazo e limite
+  detalhes: registrar empréstimo calculando vencimento e validando limite e disponibilidade.
+  relacionado_a:
+  - UC003
+  status: nao_especificado
+- id: TSK007
+  descricao: API de devolução e cálculo de multa
+  detalhes: registrar devolução, liberar livro e calcular multa por dia corrido.
+  relacionado_a:
+  - UC004
+  status: nao_especificado
+- id: TSK009
+  descricao: Consulta de empréstimos do sócio (mobile)
+  detalhes: página responsiva de consulta por número de carteirinha.
+  relacionado_a:
+  - UC005
+  status: nao_especificado
+- id: TSK008
+  descricao: Telas da bibliotecária (livros, sócios, empréstimo, devolução)
+  detalhes: interface web responsiva consumindo as APIs.
+  relacionado_a:
+  - UC001
+  status: nao_especificado
+tasks:
+- id: TSK001
+  titulo: Preparar repositório, CI e deploy em PaaS
+  descricao: criar repositório, pipeline de CI e ambiente de homologação com PostgreSQL.
+  caso_de_uso: null
+  refs:
+  - ADR-001
+  - RNF002
+  depende_de: []
+  tipo: devops
+  estimativa: 5.0
+  criterios:
+  - id: C1
+    descricao: criar repositório, pipeline de CI e ambiente de homologação com PostgreSQL.
+    origem: descricao_da_task
+  - id: C2
+    descricao: pipeline roda testes em todo PR
+    origem: definition_of_done
+  - id: C3
+    descricao: ambiente de homologação acessível
+    origem: definition_of_done
+  casos_de_teste: []
+- id: TSK002
+  titulo: Modelar e migrar tabelas livro, sócio e empréstimo
+  descricao: criar entidades conforme er.mmd e migrações.
+  caso_de_uso: UC001
+  refs:
+  - US001
+  - US002
+  - US003
+  - AC001.1
+  depende_de:
+  - TSK001
+  tipo: dados
+  estimativa: 3.0
+  criterios:
+  - id: C1
+    descricao: criar entidades conforme er.mmd e migrações.
+    origem: descricao_da_task
+  - id: C2
+    descricao: migrações aplicam e revertem sem erro
+    origem: definition_of_done
+  - id: C3
+    descricao: restrições de unicidade para código do livro e carteirinha
+    origem: definition_of_done
+  casos_de_teste: []
+- id: TSK004
+  titulo: Autenticação da bibliotecária
+  descricao: login com política de senha de 10 caracteres ou mais.
+  caso_de_uso: UC001
+  refs:
+  - RNF002
+  - US001
+  depende_de:
+  - TSK001
+  tipo: seguranca
+  estimativa: 3.0
+  criterios:
+  - id: C1
+    descricao: login com política de senha de 10 caracteres ou mais.
+    origem: descricao_da_task
+  - id: C2
+    descricao: rotas da bibliotecária exigem sessão válida
+    origem: definition_of_done
+  - id: C3
+    descricao: política de senha aplicada
+    origem: definition_of_done
+  casos_de_teste: []
+- id: TSK003
+  titulo: API de cadastro de livros
+  descricao: endpoint de criação e listagem com validação de código duplicado.
+  caso_de_uso: UC001
+  refs:
+  - US001
+  - AC001.1
+  - AC001.2
+  depende_de:
+  - TSK002
+  tipo: backend
+  estimativa: 3.0
+  criterios:
+  - id: C1
+    descricao: endpoint de criação e listagem com validação de código duplicado.
+    origem: descricao_da_task
+  - id: C2
+    descricao: AC001.1 e AC001.2 atendidos
+    origem: definition_of_done
+  - id: C3
+    descricao: revisão de código
+    origem: definition_of_done
+  casos_de_teste:
+  - CT001.1.1
+  - CT001.2.1
+- id: TSK005
+  titulo: API de cadastro de sócios
+  descricao: criação de sócio com geração de número de carteirinha único.
+  caso_de_uso: UC002
+  refs:
+  - US002
+  - AC002.1
+  depende_de:
+  - TSK002
+  tipo: backend
+  estimativa: 2.0
+  criterios:
+  - id: C1
+    descricao: criação de sócio com geração de número de carteirinha único.
+    origem: descricao_da_task
+  - id: C2
+    descricao: AC002.1 atendido
+    origem: definition_of_done
+  casos_de_teste:
+  - CT002.1.1
+- id: TSK006
+  titulo: API de empréstimo com regras de prazo e limite
+  descricao: registrar empréstimo calculando vencimento e validando limite e disponibilidade.
+  caso_de_uso: UC003
+  refs:
+  - US003
+  - AC003.1
+  - AC003.2
+  - AC003.3
+  - RN001
+  - RN002
+  depende_de:
+  - TSK003
+  - TSK005
+  tipo: backend
+  estimativa: 5.0
+  criterios:
+  - id: C1
+    descricao: registrar empréstimo calculando vencimento e validando limite e disponibilidade.
+    origem: descricao_da_task
+  - id: C2
+    descricao: AC003.1 a AC003.3 atendidos
+    origem: definition_of_done
+  - id: C3
+    descricao: cenário concorrente de dois empréstimos do mesmo livro coberto
+    origem: definition_of_done
+  casos_de_teste:
+  - CT003.1.1
+  - CT003.2.1
+  - CT003.3.1
+- id: TSK007
+  titulo: API de devolução e cálculo de multa
+  descricao: registrar devolução, liberar livro e calcular multa por dia corrido.
+  caso_de_uso: UC004
+  refs:
+  - US004
+  - AC004.1
+  - AC004.2
+  - RN003
+  depende_de:
+  - TSK006
+  tipo: backend
+  estimativa: 3.0
+  criterios:
+  - id: C1
+    descricao: registrar devolução, liberar livro e calcular multa por dia corrido.
+    origem: descricao_da_task
+  - id: C2
+    descricao: AC004.1 e AC004.2 atendidos
+    origem: definition_of_done
+  casos_de_teste:
+  - CT004.1.1
+  - CT004.2.1
+- id: TSK009
+  titulo: Consulta de empréstimos do sócio (mobile)
+  descricao: página responsiva de consulta por número de carteirinha.
+  caso_de_uso: UC005
+  refs:
+  - US005
+  - AC005.1
+  - RNF001
+  depende_de:
+  - TSK006
+  tipo: frontend
+  estimativa: 3.0
+  criterios:
+  - id: C1
+    descricao: página responsiva de consulta por número de carteirinha.
+    origem: descricao_da_task
+  - id: C2
+    descricao: AC005.1 atendido
+    origem: definition_of_done
+  - id: C3
+    descricao: p95 abaixo de 2 s medido em teste de carga leve
+    origem: definition_of_done
+  casos_de_teste:
+  - CT005.1.1
+- id: TSK008
+  titulo: Telas da bibliotecária (livros, sócios, empréstimo, devolução)
+  descricao: interface web responsiva consumindo as APIs.
+  caso_de_uso: UC001
+  refs:
+  - US001
+  - US002
+  - US003
+  - US004
+  depende_de:
+  - TSK006
+  - TSK007
+  tipo: frontend
+  estimativa: 5.0
+  criterios:
+  - id: C1
+    descricao: interface web responsiva consumindo as APIs.
+    origem: descricao_da_task
+  - id: C2
+    descricao: fluxos principais navegáveis ponta a ponta
+    origem: definition_of_done
+  - id: C3
+    descricao: revisão de usabilidade com a bibliotecária
+    origem: definition_of_done
+  casos_de_teste: []
+ordem_implementacao:
+  requisitos_funcionais: []
+  casos_de_uso:
+  - UC001
+  - UC002
+  - UC003
+  - UC004
+  - UC005
+  tasks:
+  - TSK001
+  - TSK002
+  - TSK004
+  - TSK003
+  - TSK005
+  - TSK006
+  - TSK007
+  - TSK009
+  - TSK008
