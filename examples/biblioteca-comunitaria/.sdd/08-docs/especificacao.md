@@ -8,7 +8,7 @@
 | Modo | greenfield |
 | Metodologia | scrum |
 | Tamanho | pequeno |
-| Gerado em | 2026-10-20 |
+| Gerado em | 2026-10-21 |
 | Versão da spec | f49bc004 |
 | Status de validação | Aprovado no gate 6 |
 
@@ -24,6 +24,7 @@
 8. [Rastreabilidade](#rastreabilidade)
 9. [Glossário](#glossário)
 10. [Pendências e suposições](#pendências-e-suposições)
+11. [Ordem de implementação](#ordem-de-implementação)
 
 ## Visão geral
 
@@ -502,4 +503,39 @@ Pendências que seguem sem resposta por decisão de um usuário autorizado.
 ### Aprovação do Discovery
 
 Resumo aprovado por **Bibliotecária (responsável pelo projeto)** em 2026-10-20.
+
+
+## Ordem de implementação
+
+### Ordem de implementação
+
+Listas separadas para facilitar o planejamento. RF aparecem quando declaradas explicitamente em spec.md; as tasks respeitam dependências conhecidas.
+
+#### Requisitos funcionais (RF)
+
+Nenhum requisito com identificador RF foi declarado em `03-requisitos/spec.md`.
+
+#### Histórias de usuário (US)
+
+| Ordem | ID | História | Prioridade | MVP |
+|---|---|---|---|---|
+| 1 | US001 | Cadastrar livro | Must | sim |
+| 2 | US002 | Cadastrar sócio | Must | sim |
+| 3 | US003 | Registrar empréstimo | Must | sim |
+| 4 | US004 | Registrar devolução com multa | Must | sim |
+| 5 | US005 | Consultar meus empréstimos | Should | não |
+
+#### Tasks
+
+| Ordem | ID | Task | Depende de | Refs | Estimativa |
+|---|---|---|---|---|---|
+| 1 | TSK001 | Preparar repositório, CI e deploy em PaaS | — | ADR-001, RNF002 | 5 |
+| 2 | TSK002 | Modelar e migrar tabelas livro, sócio e empréstimo | TSK001 | US001, US002, US003, AC001.1 | 3 |
+| 3 | TSK004 | Autenticação da bibliotecária | TSK001 | RNF002, US001 | 3 |
+| 4 | TSK003 | API de cadastro de livros | TSK002 | US001, AC001.1, AC001.2 | 3 |
+| 5 | TSK005 | API de cadastro de sócios | TSK002 | US002, AC002.1 | 2 |
+| 6 | TSK006 | API de empréstimo com regras de prazo e limite | TSK003, TSK005 | US003, AC003.1, AC003.2, AC003.3, RN001, RN002 | 5 |
+| 7 | TSK007 | API de devolução e cálculo de multa | TSK006 | US004, AC004.1, AC004.2, RN003 | 3 |
+| 8 | TSK009 | Consulta de empréstimos do sócio (mobile) | TSK006 | US005, AC005.1, RNF001 | 3 |
+| 9 | TSK008 | Telas da bibliotecária (livros, sócios, empréstimo, devolução) | TSK006, TSK007 | US001, US002, US003, US004 | 5 |
 

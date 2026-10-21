@@ -75,7 +75,7 @@ def table(head, rows):
     if not rows:
         return ""
     out = ["| " + " | ".join(head) + " |", "|" + "|".join("---" for _ in head) + "|"]
-    out += ["| " + " | ".join(cell(c) if not c.startswith("\0") else c[1:] for c in r) + " |" for r in rows]
+    out += ["| " + " | ".join(cell(c) if not str(c).startswith("\0") else str(c)[1:] for c in r) + " |" for r in rows]
     return "\n".join(out)
 
 
@@ -270,6 +270,11 @@ body { font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, 
 h1 { font-size: 22pt; margin: 0 0 6px; } h2 { font-size: 16pt; border-bottom: 2px solid #2b5fab; padding-bottom: 4px; margin-top: 28px; page-break-before: always; color: #17325c; }
 h3 { font-size: 13pt; margin-top: 22px; color: #17325c; } h4 { font-size: 11.5pt; margin-top: 16px; } h5, h6 { font-size: 10.5pt; }
 h2, h3, h4 { page-break-after: avoid; }
+thead { display: table-header-group; } tfoot { display: table-footer-group; }
+tr, blockquote, .diagrama, .diagrama-fonte { break-inside: avoid; }
+li { orphans: 2; widows: 2; } a { color: #174a8b; }
+.toc li { margin: 4px 0; }
+@media print { h2 { break-before: page; } .capa { min-height: 245mm; } table { font-size: 8.5pt; } }
 table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.5pt; page-break-inside: auto; } tr { page-break-inside: avoid; }
 th, td { border: 1px solid #c9d1dc; padding: 5px 8px; text-align: left; vertical-align: top; } th { background: #eef3fa; }
 code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 9pt; background: #f2f4f7; padding: 1px 4px; border-radius: 3px; }
@@ -447,6 +452,45 @@ def trace_md(spec, tasks, tests):
     return table(["US", "AC", "Tasks", "Casos de teste"], rows)
 
 
+
+def implementation_order_md(spec, tasks, lvl):
+    """Blocos finais e separados com a ordem de RF, US e tasks."""
+    h = "#" * lvl
+    out = [f"{h} Ordem de implementação", "",
+           "Listas separadas para facilitar o planejamento. RF aparecem quando declaradas explicitamente em spec.md; "
+           "as tasks respeitam dependências conhecidas.", ""]
+    out += [f"{h}# Requisitos funcionais (RF)", ""]
+    if spec.get("rf"):
+        out += [table(["Ordem", "ID", "Requisito"], [(i, rid, text) for i, (rid, text) in enumerate(spec["rf"], 1)]), ""]
+    else:
+        out += ["Nenhum requisito com identificador RF foi declarado em `03-requisitos/spec.md`.", ""]
+    out += [f"{h}# Histórias de usuário (US)", ""]
+    if spec["stories"]:
+        out += [table(["Ordem", "ID", "História", "Prioridade", "MVP"], [
+            (i, st["id"], st["title"], st["fields"].get("prioridade", ""), st["fields"].get("mvp", ""))
+            for i, st in enumerate(spec["stories"], 1)]), ""]
+    else:
+        out += ["Nenhuma US encontrada.", ""]
+    # Ordenação topológica estável: tarefas sem dependências primeiro; ciclo restante é exibido ao final.
+    by_id = {t["id"]: t for t in tasks}
+    pending = list(tasks); ordered = []; done = set()
+    while pending:
+        ready = [t for t in pending if all(d not in by_id or d in done for d in t["depende"])]
+        if not ready:
+            ordered.extend(pending)
+            break
+        for task in ready:
+            ordered.append(task); done.add(task["id"]); pending.remove(task)
+    out += [f"{h}# Tasks", ""]
+    if ordered:
+        out += [table(["Ordem", "ID", "Task", "Depende de", "Refs", "Estimativa"], [
+            (i, t["id"], t["title"], ", ".join(t["depende"]) or "—", ", ".join(t["refs"]) or "—",
+             f"{t['est']:g}" if t["est"] is not None else "—") for i, t in enumerate(ordered, 1)]), ""]
+    else:
+        out += ["Nenhuma task encontrada.", ""]
+    return "\n".join(out)
+
+
 def pending_md(sdd, lvl):
     h, out = "#" * lvl, []
     qs = bold_items(clean(read(sdd / QUESTIONS)), "Q")
@@ -543,6 +587,8 @@ def build(sdd, formatos, out_dir, render):
             if has_content(t):
                 parts.append(f"### {c.name}\n\n" + include(t, 4, drop_h1=True))
         ch.append(("Mudanças (evolução)", "\n\n".join(parts)))
+    # Sempre o último capítulo: listas independentes de RF, US e tasks.
+    ch.append(("Ordem de implementação", implementation_order_md(spec, tasks, 3)))
     ch = [(t, b) for t, b in ch if b.strip()]
 
     def cover_md():

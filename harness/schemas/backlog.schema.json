@@ -2,21 +2,187 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "SDD backlog canônico",
   "type": "object",
-  "required": ["versao_schema", "projeto", "metodologia", "epicos", "fundacao"],
+  "required": [
+    "versao_schema",
+    "projeto",
+    "metodologia",
+    "epicos",
+    "fundacao"
+  ],
   "properties": {
-    "versao_schema": {"const": 1},
-    "projeto": {"type": "string"},
-    "metodologia": {"enum": ["scrum", "kanban"]},
-    "gerado_em": {"type": "string"},
-    "epicos": {"type": "array", "items": {"type": "object", "required": ["id", "titulo", "historias"], "properties": {
-      "id": {"pattern": "^EP\\d{3}$"}, "titulo": {"type": "string"},
-      "historias": {"type": "array", "items": {"type": "object", "required": ["id", "titulo", "prioridade", "mvp", "historia", "criterios", "tasks"], "properties": {
-        "id": {"pattern": "^US\\d{3}$"}, "mvp": {"type": "boolean"},
-        "criterios": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "tipo", "texto"], "properties": {"id": {"pattern": "^AC\\d{3}\\.\\d+$"}, "tipo": {"enum": ["BDD", "EARS"]}}}},
-        "tasks": {"type": "array", "items": {"$ref": "#/$defs/task"}}}}}}}},
-    "fundacao": {"type": "array", "items": {"$ref": "#/$defs/task"}},
-    "rnf": {"type": "array"}
+    "versao_schema": {
+      "const": 2
+    },
+    "projeto": {
+      "type": "string"
+    },
+    "metodologia": {
+      "enum": [
+        "scrum",
+        "kanban"
+      ]
+    },
+    "gerado_em": {
+      "type": "string"
+    },
+    "epicos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "titulo",
+          "historias"
+        ],
+        "properties": {
+          "id": {
+            "pattern": "^EP\\d{3}$"
+          },
+          "titulo": {
+            "type": "string"
+          },
+          "historias": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "titulo",
+                "prioridade",
+                "mvp",
+                "historia",
+                "criterios",
+                "tasks"
+              ],
+              "properties": {
+                "id": {
+                  "pattern": "^US\\d{3}$"
+                },
+                "mvp": {
+                  "type": "boolean"
+                },
+                "criterios": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "tipo",
+                      "texto"
+                    ],
+                    "properties": {
+                      "id": {
+                        "pattern": "^AC\\d{3}\\.\\d+$"
+                      },
+                      "tipo": {
+                        "enum": [
+                          "BDD",
+                          "EARS"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "tasks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/task"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fundacao": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "rnf": {
+      "type": "array"
+    },
+    "requisitos_funcionais": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "texto"
+        ],
+        "properties": {
+          "id": {
+            "pattern": "^RF\\d{3}$"
+          },
+          "texto": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "regras_de_negocio": {
+      "type": "array"
+    },
+    "ordem_implementacao": {
+      "type": "object",
+      "required": [
+        "rf",
+        "us",
+        "tasks"
+      ],
+      "properties": {
+        "rf": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "us": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "catalogo_ordem": {
+      "type": "object"
+    }
   },
-  "$defs": {"task": {"type": "object", "required": ["id", "titulo", "tipo", "estimativa", "refs", "dod"], "properties": {
-    "id": {"pattern": "^(TSK|SPK)\\d{3}$"}, "estimativa": {"type": "number"}, "depende_de": {"type": "array", "items": {"type": "string"}}}}}
+  "$defs": {
+    "task": {
+      "type": "object",
+      "required": [
+        "id",
+        "titulo",
+        "tipo",
+        "estimativa",
+        "refs",
+        "dod"
+      ],
+      "properties": {
+        "id": {
+          "pattern": "^(TSK|SPK)\\d{3}$"
+        },
+        "estimativa": {
+          "type": "number"
+        },
+        "depende_de": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
 }

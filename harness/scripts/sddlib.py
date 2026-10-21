@@ -238,9 +238,10 @@ def parse_spec(text):
     stories = blocks(t, re.compile(r"^###\s+(US\d{3}):\s*(.+)$"))
     for s in stories:
         s["acs"] = parse_acs(s["text"])
+    rf = [(m.group(1), m.group(2)) for m in re.finditer(r"^\*\*(RF\d{3})\*\*:\s*(.+)$", t, re.M)]
     rn = [(m.group(1), m.group(2)) for m in re.finditer(r"^\*\*(RN\d{3})\*\*:\s*(.+)$", t, re.M)]
     rnf = [(m.group(1), m.group(2)) for m in re.finditer(r"^\*\*(RNF\d{3})\*\*:\s*(.+)$", t, re.M)]
-    return {"epics": epics, "stories": stories, "rn": rn, "rnf": rnf, "text": t}
+    return {"epics": epics, "stories": stories, "rf": rf, "rn": rn, "rnf": rnf, "text": t}
 
 
 def parse_tasks(text):

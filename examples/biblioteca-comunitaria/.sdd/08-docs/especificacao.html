@@ -1,0 +1,238 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Biblioteca Comunitária: Especificação</title><style>
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; @bottom-center { content: counter(page) " / " counter(pages); font-size: 9pt; color: #666; } }
+:root { color-scheme: light; }
+body { font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: #1a1a1a; max-width: 980px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 22pt; margin: 0 0 6px; } h2 { font-size: 16pt; border-bottom: 2px solid #2b5fab; padding-bottom: 4px; margin-top: 28px; page-break-before: always; color: #17325c; }
+h3 { font-size: 13pt; margin-top: 22px; color: #17325c; } h4 { font-size: 11.5pt; margin-top: 16px; } h5, h6 { font-size: 10.5pt; }
+h2, h3, h4 { page-break-after: avoid; }
+thead { display: table-header-group; } tfoot { display: table-footer-group; }
+tr, blockquote, .diagrama, .diagrama-fonte { break-inside: avoid; }
+li { orphans: 2; widows: 2; } a { color: #174a8b; }
+.toc li { margin: 4px 0; }
+@media print { h2 { break-before: page; } .capa { min-height: 245mm; } table { font-size: 8.5pt; } }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.5pt; page-break-inside: auto; } tr { page-break-inside: avoid; }
+th, td { border: 1px solid #c9d1dc; padding: 5px 8px; text-align: left; vertical-align: top; } th { background: #eef3fa; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 9pt; background: #f2f4f7; padding: 1px 4px; border-radius: 3px; }
+pre { background: #f6f8fa; border: 1px solid #dde3ea; padding: 10px; overflow: auto; white-space: pre-wrap; page-break-inside: avoid; } pre code { background: none; padding: 0; }
+blockquote { border-left: 4px solid #2b5fab; margin: 10px 0; padding: 4px 14px; background: #f5f8fd; }
+.diagrama { text-align: center; margin: 12px 0; page-break-inside: avoid; } .diagrama img { max-width: 100%; max-height: 230mm; }
+.aviso { color: #8a5a00; font-style: italic; }
+.capa { min-height: 200mm; page-break-after: always; display: flex; flex-direction: column; justify-content: center; } .capa .sub { font-size: 14pt; color: #555; margin-bottom: 28px; }
+.rascunho { color: #b00020; font-weight: bold; } .ok { color: #1b7f3b; font-weight: bold; }
+.toc { page-break-after: always; } .toc a { text-decoration: none; color: #17325c; } .toc ul { list-style: none; padding-left: 16px; } .toc > ul { padding-left: 0; }
+@media print { body { max-width: none; padding: 0; } }
+</style></head><body><section class="capa"><h1>Biblioteca Comunitária</h1><div class="sub">Documento de Especificação do Sistema</div><table><tr><th>Projeto</th><td>Biblioteca Comunitária</td></tr><tr><th>Modo</th><td>greenfield</td></tr><tr><th>Metodologia</th><td>scrum</td></tr><tr><th>Tamanho</th><td>pequeno</td></tr><tr><th>Gerado em</th><td>2026-10-21</td></tr><tr><th>Versão da spec</th><td>f49bc004</td></tr><tr><th>Status de validação</th><td class=ok>Aprovado no gate 6</td></tr></table></section><section class="toc"><h2 style="page-break-before:auto">Sumário</h2><ul><li><a href="#visão-geral">Visão geral</a></li><li><a href="#stack-e-decisões-arquiteturais">Stack e decisões arquiteturais</a></li><li><a href="#requisitos">Requisitos</a></li><li><a href="#casos-de-uso">Casos de uso</a></li><li><a href="#design-e-uml">Design e UML</a></li><li><a href="#planejamento">Planejamento</a></li><li><a href="#plano-de-testes">Plano de testes</a></li><li><a href="#rastreabilidade">Rastreabilidade</a></li><li><a href="#glossário">Glossário</a></li><li><a href="#pendências-e-suposições">Pendências e suposições</a></li><li><a href="#ordem-de-implementação">Ordem de implementação</a></li></ul></section>
+
+<h2 id="visão-geral">Visão geral</h2>
+<h3 id="resumo">Resumo</h3>
+<p>Sistema web simples para a biblioteca de um bairro controlar o acervo, os sócios, os empréstimos (prazo de 14 dias, limite de 3 livros) e a multa por atraso, com consulta do sócio pelo celular.</p>
+<h3 id="atores">Atores</h3>
+<table><thead><tr><th>Ator</th><th>Descrição</th><th>Objetivos</th></tr></thead><tbody><tr><td>Bibliotecária</td><td>Operadora do sistema</td><td>Controlar acervo, sócios e empréstimos</td></tr><tr><td>Sócio</td><td>Frequentador cadastrado</td><td>Consultar seus empréstimos</td></tr></tbody></table>
+<h3 id="escopo">Escopo</h3>
+<h4 id="dentro">Dentro</h4>
+<p>Cadastro de livros e sócios, empréstimo, devolução com multa, consulta do sócio.</p>
+<h4 id="fora">Fora</h4>
+<p>Reservas, pagamento online da multa, integração com catálogo externo.</p>
+<h3 id="dimensionamento">Dimensionamento</h3>
+<ul><li><strong>Tamanho proposto:</strong> pequeno (5 US, sem integrações, sem compliance regulatório)</li></ul>
+<h2 id="stack-e-decisões-arquiteturais">Stack e decisões arquiteturais</h2>
+<p>Prioridade: manutenibilidade, custo, time_to_market. Equipe de 3 pessoas que já domina Python e Postgres.</p>
+<table><thead><tr><th>Camada</th><th>Escolha</th><th>ADR</th><th>Alternativas rejeitadas</th></tr></thead><tbody><tr><td>banco</td><td>postgres</td><td>ADR-001</td><td>mysql, mongodb</td></tr></tbody></table>
+<h3 id="adr-001-banco-relacional-postgresql">ADR-001: Banco relacional (PostgreSQL)</h3>
+<ul><li><strong>Status:</strong> aceita</li><li><strong>Data:</strong> 2026-10-19</li><li><strong>Verificado em:</strong> 2026-10-19</li><li><strong>Camada:</strong> banco</li></ul>
+<h4 id="contexto">Contexto</h4>
+<p>Dados relacionais (livros, sócios, empréstimos) e regras transacionais (RN002).</p>
+<h4 id="decisão">Decisão</h4>
+<p>PostgreSQL, que o time já domina.</p>
+<h4 id="alternativas-consideradas">Alternativas consideradas</h4>
+<table><thead><tr><th>Alternativa</th><th>Motivo da rejeição</th></tr></thead><tbody><tr><td>MongoDB</td><td>dados fortemente relacionais</td></tr></tbody></table>
+<h4 id="consequências">Consequências</h4>
+<ul><li>Positivas: transações e integridade referencial.</li><li>Negativas: nenhuma relevante para a escala prevista.</li></ul>
+<h4 id="tasks-geradas">Tasks geradas</h4>
+<p>TSK001</p>
+<h3 id="adr-002-django--drf">ADR-002: Django + DRF</h3>
+<ul><li><strong>Status:</strong> aceita</li><li><strong>Data:</strong> 2026-10-19</li><li><strong>Verificado em:</strong> 2026-10-19</li><li><strong>Camada:</strong> backend</li></ul>
+<h4 id="contexto-1">Contexto</h4>
+<p>Time domina Python e o Django entrega admin, ORM e migrações prontas.</p>
+<h4 id="decisão-1">Decisão</h4>
+<p>Django + DRF.</p>
+<h4 id="alternativas-consideradas-1">Alternativas consideradas</h4>
+<table><thead><tr><th>Alternativa</th><th>Motivo da rejeição</th></tr></thead><tbody><tr><td>ver analise.md</td><td>escopo pequeno e equipe reduzida</td></tr></tbody></table>
+<h4 id="consequências-1">Consequências</h4>
+<ul><li>Positivas: entrega rápida.</li><li>Negativas: revisar a escolha se o escopo crescer para grande.</li></ul>
+<h4 id="tasks-geradas-1">Tasks geradas</h4>
+<p>TSK001</p>
+<h3 id="adr-003-paas-gerenciado">ADR-003: PaaS gerenciado</h3>
+<ul><li><strong>Status:</strong> aceita</li><li><strong>Data:</strong> 2026-10-19</li><li><strong>Verificado em:</strong> 2026-10-19</li><li><strong>Camada:</strong> infra</li></ul>
+<h4 id="contexto-2">Contexto</h4>
+<p>Time de 3 pessoas sem perfil de operação; prioriza time-to-market e custo baixo.</p>
+<h4 id="decisão-2">Decisão</h4>
+<p>PaaS gerenciado.</p>
+<h4 id="alternativas-consideradas-2">Alternativas consideradas</h4>
+<table><thead><tr><th>Alternativa</th><th>Motivo da rejeição</th></tr></thead><tbody><tr><td>ver analise.md</td><td>escopo pequeno e equipe reduzida</td></tr></tbody></table>
+<h4 id="consequências-2">Consequências</h4>
+<ul><li>Positivas: entrega rápida.</li><li>Negativas: revisar a escolha se o escopo crescer para grande.</li></ul>
+<h4 id="tasks-geradas-2">Tasks geradas</h4>
+<p>TSK001</p>
+<h2 id="requisitos">Requisitos</h2>
+<h3 id="ep001--acervo-e-sócios">EP001 · Acervo e sócios</h3>
+<h4 id="us001--cadastrar-livro">US001 · Cadastrar livro</h4>
+<blockquote>Como bibliotecária, quero cadastrar livros no acervo para controlar quais títulos estão disponíveis.</blockquote>
+<table><thead><tr><th>Prioridade</th><th>MVP</th><th>Regras</th><th>NFR</th><th>Origem</th></tr></thead><tbody><tr><td>Must</td><td>sim</td><td>—</td><td>RNF002</td><td>intake ("A bibliotecária cadastra os livros") e A001</td></tr></tbody></table>
+<p><strong>Critérios de aceite</strong></p>
+<ul><li><strong>AC001.1 (BDD):</strong> <em>Dado que</em> a bibliotecária está autenticada · <em>Quando</em> informa título, autor e código do livro e confirma · <em>Então</em> o livro aparece na lista do acervo com status "disponível"</li><li><strong>AC001.2 (EARS):</strong> Se o código informado já existir no acervo, então o sistema deve recusar o cadastro e exibir a mensagem "Código já cadastrado".</li></ul>
+<h4 id="us002--cadastrar-sócio">US002 · Cadastrar sócio</h4>
+<blockquote>Como bibliotecária, quero cadastrar sócios para registrar quem pode pegar livros emprestados.</blockquote>
+<table><thead><tr><th>Prioridade</th><th>MVP</th><th>Regras</th><th>NFR</th><th>Origem</th></tr></thead><tbody><tr><td>Must</td><td>sim</td><td>—</td><td>—</td><td>intake ("e os sócios")</td></tr></tbody></table>
+<p><strong>Critérios de aceite</strong></p>
+<ul><li><strong>AC002.1 (BDD):</strong> <em>Dado que</em> a bibliotecária está autenticada · <em>Quando</em> informa nome e telefone do sócio e confirma · <em>Então</em> o sistema gera um número de carteirinha único e exibe o sócio como "ativo"</li></ul>
+<h3 id="ep002--empréstimos">EP002 · Empréstimos</h3>
+<h4 id="us003--registrar-empréstimo">US003 · Registrar empréstimo</h4>
+<blockquote>Como bibliotecária, quero registrar o empréstimo de um livro a um sócio para controlar prazos e disponibilidade.</blockquote>
+<table><thead><tr><th>Prioridade</th><th>MVP</th><th>Regras</th><th>NFR</th><th>Origem</th></tr></thead><tbody><tr><td>Must</td><td>sim</td><td>RN001, RN002</td><td>—</td><td>intake ("registra o empréstimo, com prazo de 14 dias")</td></tr></tbody></table>
+<p><strong>Critérios de aceite</strong></p>
+<ul><li><strong>AC003.1 (BDD):</strong> <em>Dado que</em> o livro está disponível e o sócio possui menos de 3 empréstimos ativos · <em>Quando</em> a bibliotecária registra o empréstimo · <em>Então</em> o livro passa a "emprestado" e a data de vencimento é a data atual mais 14 dias</li><li><strong>AC003.2 (EARS):</strong> Se o sócio já possuir 3 empréstimos ativos, então o sistema deve impedir o novo empréstimo e informar o limite.</li><li><strong>AC003.3 (EARS):</strong> Se o livro estiver com status "emprestado", então o sistema deve impedir o empréstimo e informar a data prevista de devolução.</li></ul>
+<h4 id="us004--registrar-devolução-com-multa">US004 · Registrar devolução com multa</h4>
+<blockquote>Como bibliotecária, quero registrar a devolução e calcular a multa de atraso para liberar o livro e cobrar o valor devido.</blockquote>
+<table><thead><tr><th>Prioridade</th><th>MVP</th><th>Regras</th><th>NFR</th><th>Origem</th></tr></thead><tbody><tr><td>Must</td><td>sim</td><td>RN003</td><td>—</td><td>intake ("cobra multa de 50 centavos por dia de atraso") e Q001</td></tr></tbody></table>
+<p><strong>Critérios de aceite</strong></p>
+<ul><li><strong>AC004.1 (BDD):</strong> <em>Dado que</em> existe um empréstimo ativo vencido há 4 dias · <em>Quando</em> a bibliotecária registra a devolução · <em>Então</em> o livro volta a "disponível" e o sistema exibe multa de R$ 2,00</li><li><strong>AC004.2 (EARS):</strong> Quando a devolução ocorrer até a data de vencimento, o sistema deve concluir a devolução sem multa.</li></ul>
+<h4 id="us005--consultar-meus-empréstimos">US005 · Consultar meus empréstimos</h4>
+<blockquote>Como sócio, quero consultar meus empréstimos e vencimentos pelo celular para devolver os livros no prazo.</blockquote>
+<table><thead><tr><th>Prioridade</th><th>MVP</th><th>Regras</th><th>NFR</th><th>Origem</th></tr></thead><tbody><tr><td>Should</td><td>não</td><td>—</td><td>RNF001</td><td>intake ("consultar pelo celular o que está com ele") e A002</td></tr></tbody></table>
+<p><strong>Critérios de aceite</strong></p>
+<ul><li><strong>AC005.1 (BDD):</strong> <em>Dado que</em> o sócio informa seu número de carteirinha · <em>Quando</em> abre a consulta · <em>Então</em> vê a lista de livros emprestados com a data de vencimento de cada um</li></ul>
+<h3 id="regras-de-negócio">Regras de negócio</h3>
+<table><thead><tr><th>ID</th><th>Regra</th></tr></thead><tbody><tr><td>RN001</td><td>O prazo de empréstimo é de 14 dias corridos.</td></tr><tr><td>RN002</td><td>Cada sócio pode ter no máximo 3 empréstimos ativos.</td></tr><tr><td>RN003</td><td>A multa é de R$ 0,50 por dia corrido de atraso, sem teto.</td></tr></tbody></table>
+<h3 id="requisitos-não-funcionais">Requisitos não funcionais</h3>
+<table><thead><tr><th>ID</th><th>Requisito</th></tr></thead><tbody><tr><td>RNF001</td><td>A consulta do sócio deve carregar em menos de 2 segundos no p95 em conexão 4G.</td></tr><tr><td>RNF002</td><td>O acesso à área da bibliotecária exige autenticação com senha de no mínimo 10 caracteres.</td></tr></tbody></table>
+<h2 id="casos-de-uso">Casos de uso</h2>
+<h3 id="catálogo-de-casos-de-uso">Catálogo de casos de uso</h3>
+<p>Cada user story é detalhada como caso de uso: pré-condições e fluxo principal vêm dos critérios BDD; exceções vêm dos critérios EARS. Gerado automaticamente a partir da especificação.</p>
+<p><strong>Atores e seus casos de uso</strong></p>
+<table><thead><tr><th>Ator</th><th>Casos de uso</th></tr></thead><tbody><tr><td>Bibliotecária</td><td>UC-01 Cadastrar livro<br>UC-02 Cadastrar sócio<br>UC-03 Registrar empréstimo<br>UC-04 Registrar devolução com multa</td></tr><tr><td>Sócio</td><td>UC-05 Consultar meus empréstimos</td></tr></tbody></table>
+<h4 id="diagrama-de-casos-de-uso">Diagrama de casos de uso</h4>
+<div class="diagrama-fonte"><p class="aviso">Diagrama não renderizado (instale mmdc e Chrome). Código Mermaid:</p><pre><code>flowchart LR
+%% refs: US001, US002, US003, US004, US005
+    A1([&quot;Bibliotecária&quot;])
+    A2([&quot;Sócio&quot;])
+    subgraph EP001[&quot;Acervo e sócios&quot;]
+        UC_US001((&quot;US001 Cadastrar livro&quot;))
+        UC_US002((&quot;US002 Cadastrar sócio&quot;))
+    end
+    subgraph EP002[&quot;Empréstimos&quot;]
+        UC_US003((&quot;US003 Registrar empréstimo&quot;))
+        UC_US004((&quot;US004 Registrar devolução com multa&quot;))
+        UC_US005((&quot;US005 Consultar meus empréstimos&quot;))
+    end
+    A1 --&gt; UC_US001
+    A1 --&gt; UC_US002
+    A1 --&gt; UC_US003
+    A1 --&gt; UC_US004
+    A2 --&gt; UC_US005</code></pre></div>
+<h4 id="uc-01--cadastrar-livro-us001">UC-01 · Cadastrar livro (US001)</h4>
+<table><thead><tr><th>Campo</th><th>Detalhe</th></tr></thead><tbody><tr><td>Ator primário</td><td>Bibliotecária</td></tr><tr><td>Objetivo</td><td>cadastrar livros no acervo para controlar quais títulos estão disponíveis</td></tr><tr><td>Prioridade / MVP</td><td>Must / sim</td></tr><tr><td>Pré-condições</td><td>a bibliotecária está autenticada</td></tr><tr><td>Fluxo principal</td><td><strong>AC001.1</strong> Quando informa título, autor e código do livro e confirma → Então o livro aparece na lista do acervo com status "disponível"</td></tr><tr><td>Fluxos alternativos e exceções</td><td><strong>AC001.2</strong> Se o código informado já existir no acervo, então o sistema deve recusar o cadastro e exibir a mensagem "Código já cadastrado".</td></tr><tr><td>Pós-condições</td><td>o livro aparece na lista do acervo com status "disponível"</td></tr><tr><td>Regras de negócio</td><td>—</td></tr><tr><td>Critérios de aceite</td><td>AC001.1, AC001.2</td></tr><tr><td>Origem</td><td>intake ("A bibliotecária cadastra os livros") e A001</td></tr></tbody></table>
+<h4 id="uc-02--cadastrar-sócio-us002">UC-02 · Cadastrar sócio (US002)</h4>
+<table><thead><tr><th>Campo</th><th>Detalhe</th></tr></thead><tbody><tr><td>Ator primário</td><td>Bibliotecária</td></tr><tr><td>Objetivo</td><td>cadastrar sócios para registrar quem pode pegar livros emprestados</td></tr><tr><td>Prioridade / MVP</td><td>Must / sim</td></tr><tr><td>Pré-condições</td><td>a bibliotecária está autenticada</td></tr><tr><td>Fluxo principal</td><td><strong>AC002.1</strong> Quando informa nome e telefone do sócio e confirma → Então o sistema gera um número de carteirinha único e exibe o sócio como "ativo"</td></tr><tr><td>Fluxos alternativos e exceções</td><td>—</td></tr><tr><td>Pós-condições</td><td>o sistema gera um número de carteirinha único e exibe o sócio como "ativo"</td></tr><tr><td>Regras de negócio</td><td>—</td></tr><tr><td>Critérios de aceite</td><td>AC002.1</td></tr><tr><td>Origem</td><td>intake ("e os sócios")</td></tr></tbody></table>
+<h4 id="uc-03--registrar-empréstimo-us003">UC-03 · Registrar empréstimo (US003)</h4>
+<table><thead><tr><th>Campo</th><th>Detalhe</th></tr></thead><tbody><tr><td>Ator primário</td><td>Bibliotecária</td></tr><tr><td>Objetivo</td><td>registrar o empréstimo de um livro a um sócio para controlar prazos e disponibilidade</td></tr><tr><td>Prioridade / MVP</td><td>Must / sim</td></tr><tr><td>Pré-condições</td><td>o livro está disponível e o sócio possui menos de 3 empréstimos ativos</td></tr><tr><td>Fluxo principal</td><td><strong>AC003.1</strong> Quando a bibliotecária registra o empréstimo → Então o livro passa a "emprestado" e a data de vencimento é a data atual mais 14 dias</td></tr><tr><td>Fluxos alternativos e exceções</td><td><strong>AC003.2</strong> Se o sócio já possuir 3 empréstimos ativos, então o sistema deve impedir o novo empréstimo e informar o limite.<br><strong>AC003.3</strong> Se o livro estiver com status "emprestado", então o sistema deve impedir o empréstimo e informar a data prevista de devolução.</td></tr><tr><td>Pós-condições</td><td>o livro passa a "emprestado" e a data de vencimento é a data atual mais 14 dias</td></tr><tr><td>Regras de negócio</td><td><strong>RN001</strong> O prazo de empréstimo é de 14 dias corridos.<br><strong>RN002</strong> Cada sócio pode ter no máximo 3 empréstimos ativos.</td></tr><tr><td>Critérios de aceite</td><td>AC003.1, AC003.2, AC003.3</td></tr><tr><td>Origem</td><td>intake ("registra o empréstimo, com prazo de 14 dias")</td></tr></tbody></table>
+<h4 id="uc-04--registrar-devolução-com-multa-us004">UC-04 · Registrar devolução com multa (US004)</h4>
+<table><thead><tr><th>Campo</th><th>Detalhe</th></tr></thead><tbody><tr><td>Ator primário</td><td>Bibliotecária</td></tr><tr><td>Objetivo</td><td>registrar a devolução e calcular a multa de atraso para liberar o livro e cobrar o valor devido</td></tr><tr><td>Prioridade / MVP</td><td>Must / sim</td></tr><tr><td>Pré-condições</td><td>existe um empréstimo ativo vencido há 4 dias</td></tr><tr><td>Fluxo principal</td><td><strong>AC004.1</strong> Quando a bibliotecária registra a devolução → Então o livro volta a "disponível" e o sistema exibe multa de R$ 2,00</td></tr><tr><td>Fluxos alternativos e exceções</td><td><strong>AC004.2</strong> Quando a devolução ocorrer até a data de vencimento, o sistema deve concluir a devolução sem multa.</td></tr><tr><td>Pós-condições</td><td>o livro volta a "disponível" e o sistema exibe multa de R$ 2,00</td></tr><tr><td>Regras de negócio</td><td><strong>RN003</strong> A multa é de R$ 0,50 por dia corrido de atraso, sem teto.</td></tr><tr><td>Critérios de aceite</td><td>AC004.1, AC004.2</td></tr><tr><td>Origem</td><td>intake ("cobra multa de 50 centavos por dia de atraso") e Q001</td></tr></tbody></table>
+<h4 id="uc-05--consultar-meus-empréstimos-us005">UC-05 · Consultar meus empréstimos (US005)</h4>
+<table><thead><tr><th>Campo</th><th>Detalhe</th></tr></thead><tbody><tr><td>Ator primário</td><td>Sócio</td></tr><tr><td>Objetivo</td><td>consultar meus empréstimos e vencimentos pelo celular para devolver os livros no prazo</td></tr><tr><td>Prioridade / MVP</td><td>Should / não</td></tr><tr><td>Pré-condições</td><td>o sócio informa seu número de carteirinha</td></tr><tr><td>Fluxo principal</td><td><strong>AC005.1</strong> Quando abre a consulta → Então vê a lista de livros emprestados com a data de vencimento de cada um</td></tr><tr><td>Fluxos alternativos e exceções</td><td>—</td></tr><tr><td>Pós-condições</td><td>vê a lista de livros emprestados com a data de vencimento de cada um</td></tr><tr><td>Regras de negócio</td><td>—</td></tr><tr><td>Critérios de aceite</td><td>AC005.1</td></tr><tr><td>Origem</td><td>intake ("consultar pelo celular o que está com ele") e A002</td></tr></tbody></table>
+<h2 id="design-e-uml">Design e UML</h2>
+<p>Aplicação web monolítica com API REST e interface responsiva. Banco PostgreSQL (ADR-001).</p>
+<h3 id="diagramas">Diagramas</h3>
+<ul><li><code>er.mmd</code>: modelo de dados</li><li><code>sequencia-emprestimo.mmd</code>: fluxo de registro de empréstimo</li></ul>
+<h3 id="diagramas-uml">Diagramas UML</h3>
+<h4 id="casos-de-uso-1">Casos de uso</h4>
+<p><em>Cobre: US001, US002, US003, US004, US005</em></p>
+<div class="diagrama-fonte"><p class="aviso">Diagrama não renderizado (instale mmdc e Chrome). Código Mermaid:</p><pre><code>flowchart LR
+%% refs: US001, US002, US003, US004, US005
+    A1([&quot;Bibliotecária&quot;])
+    A2([&quot;Sócio&quot;])
+    subgraph EP001[&quot;Acervo e sócios&quot;]
+        UC_US001((&quot;US001 Cadastrar livro&quot;))
+        UC_US002((&quot;US002 Cadastrar sócio&quot;))
+    end
+    subgraph EP002[&quot;Empréstimos&quot;]
+        UC_US003((&quot;US003 Registrar empréstimo&quot;))
+        UC_US004((&quot;US004 Registrar devolução com multa&quot;))
+        UC_US005((&quot;US005 Consultar meus empréstimos&quot;))
+    end
+    A1 --&gt; UC_US001
+    A1 --&gt; UC_US002
+    A1 --&gt; UC_US003
+    A1 --&gt; UC_US004
+    A2 --&gt; UC_US005</code></pre></div>
+<h4 id="modelo-er">Modelo ER</h4>
+<p><em>Cobre: US001, US002, US003, RN002</em></p>
+<div class="diagrama-fonte"><p class="aviso">Diagrama não renderizado (instale mmdc e Chrome). Código Mermaid:</p><pre><code>%% refs: US001, US002, US003, RN002
+erDiagram
+    LIVRO ||--o{ EMPRESTIMO : &quot;é emprestado em&quot;
+    SOCIO ||--o{ EMPRESTIMO : &quot;realiza&quot;
+    LIVRO { string codigo PK
+            string titulo
+            string autor
+            string status }
+    SOCIO { int carteirinha PK
+            string nome
+            string telefone }
+    EMPRESTIMO { int id PK
+                 date retirada
+                 date vencimento
+                 date devolucao
+                 decimal multa }</code></pre></div>
+<h4 id="sequência-emprestimo">Sequência: emprestimo</h4>
+<p><em>Cobre: US003, RN001, RN002</em></p>
+<div class="diagrama-fonte"><p class="aviso">Diagrama não renderizado (instale mmdc e Chrome). Código Mermaid:</p><pre><code>%% refs: US003, RN001, RN002
+sequenceDiagram
+    actor B as Bibliotecária
+    participant UI as Interface web
+    participant API as API
+    participant DB as PostgreSQL
+    B-&gt;&gt;UI: informa livro e sócio
+    UI-&gt;&gt;API: POST /emprestimos
+    API-&gt;&gt;DB: conta empréstimos ativos do sócio
+    DB--&gt;&gt;API: total
+    alt total menor que 3 e livro disponível
+        API-&gt;&gt;DB: grava empréstimo (vencimento = hoje + 14 dias)
+        API--&gt;&gt;UI: 201 vencimento
+    else limite ou indisponível
+        API--&gt;&gt;UI: 422 motivo
+    end</code></pre></div>
+<h2 id="planejamento">Planejamento</h2>
+<h3 id="tasks">Tasks</h3>
+<p><strong>9 tasks · 32 (pontos/dias) no total.</strong> Caminho crítico: TSK001 → TSK002 → TSK003 → TSK006 → TSK007 → TSK008 (24).</p>
+<table><thead><tr><th>ID</th><th>Título</th><th>Tipo</th><th>Est.</th><th>Depende de</th><th>Refs</th></tr></thead><tbody><tr><td>TSK001</td><td>Preparar repositório, CI e deploy em PaaS</td><td>devops</td><td>5</td><td>—</td><td>ADR-001, RNF002</td></tr><tr><td>TSK002</td><td>Modelar e migrar tabelas livro, sócio e empréstimo</td><td>dados</td><td>3</td><td>TSK001</td><td>US001, US002, US003, AC001.1</td></tr><tr><td>TSK003</td><td>API de cadastro de livros</td><td>backend</td><td>3</td><td>TSK002</td><td>US001, AC001.1, AC001.2</td></tr><tr><td>TSK004</td><td>Autenticação da bibliotecária</td><td>seguranca</td><td>3</td><td>TSK001</td><td>RNF002, US001</td></tr><tr><td>TSK005</td><td>API de cadastro de sócios</td><td>backend</td><td>2</td><td>TSK002</td><td>US002, AC002.1</td></tr><tr><td>TSK006</td><td>API de empréstimo com regras de prazo e limite</td><td>backend</td><td>5</td><td>TSK003, TSK005</td><td>US003, AC003.1, AC003.2, AC003.3, RN001, RN002</td></tr><tr><td>TSK007</td><td>API de devolução e cálculo de multa</td><td>backend</td><td>3</td><td>TSK006</td><td>US004, AC004.1, AC004.2, RN003</td></tr><tr><td>TSK008</td><td>Telas da bibliotecária (livros, sócios, empréstimo, devolução)</td><td>frontend</td><td>5</td><td>TSK006, TSK007</td><td>US001, US002, US003, US004</td></tr><tr><td>TSK009</td><td>Consulta de empréstimos do sócio (mobile)</td><td>frontend</td><td>3</td><td>TSK006</td><td>US005, AC005.1, RNF001</td></tr></tbody></table>
+<p>Distribuição por tipo: backend 13, dados 3, devops 5, frontend 8, seguranca 3</p>
+<h3 id="plano-scrum">Plano Scrum</h3>
+<p>Velocidade assumida: 20 pts/sprint (sprints de 2 semanas, equipe de 3).</p>
+<table><thead><tr><th>Sprint</th><th>Meta</th><th>Tasks</th><th>Pontos</th></tr></thead><tbody><tr><td>1</td><td>Fundação e cadastros</td><td>TSK001, TSK002, TSK003, TSK004, TSK005</td><td>16</td></tr><tr><td>2</td><td>Empréstimo, devolução e telas</td><td>TSK006, TSK007, TSK008, TSK009</td><td>16</td></tr></tbody></table>
+<h3 id="riscos">Riscos</h3>
+<table><thead><tr><th>ID</th><th>Risco</th><th>Probabilidade</th><th>Impacto</th><th>Mitigação</th><th>Dono</th></tr></thead><tbody><tr><td>RSK001</td><td>Concorrência no registro de empréstimo do mesmo livro.</td><td>média</td><td>médio</td><td>transação com bloqueio; caso de teste de concorrência (TSK006)</td><td>tech lead</td></tr></tbody></table>
+<h2 id="plano-de-testes">Plano de testes</h2>
+<table><thead><tr><th>Caso</th><th>Título</th><th>Cobre</th><th>Nível</th><th>Resultado esperado</th></tr></thead><tbody><tr><td>CT001.1.1</td><td>Cadastro de livro válido</td><td>AC001.1</td><td>integração</td><td>livro listado com status "disponível"</td></tr><tr><td>CT001.2.1</td><td>Código de livro duplicado</td><td>AC001.2</td><td>integração</td><td>recusa com mensagem "Código já cadastrado"</td></tr><tr><td>CT002.1.1</td><td>Cadastro de sócio gera carteirinha única</td><td>AC002.1</td><td>integração</td><td>carteirinha distinta para dois cadastros consecutivos</td></tr><tr><td>CT003.1.1</td><td>Empréstimo válido define vencimento em 14 dias</td><td>AC003.1</td><td>integração</td><td>vencimento igual à data atual mais 14 dias</td></tr><tr><td>CT003.2.1</td><td>Quarto empréstimo é recusado</td><td>AC003.2</td><td>integração</td><td>recusa informando o limite de 3</td></tr><tr><td>CT003.3.1</td><td>Livro já emprestado é recusado</td><td>AC003.3</td><td>integração</td><td>recusa informando a data prevista de devolução</td></tr><tr><td>CT004.1.1</td><td>Devolução com 4 dias de atraso</td><td>AC004.1</td><td>unitário</td><td>multa de R$ 2,00 e livro disponível</td></tr><tr><td>CT004.2.1</td><td>Devolução no prazo</td><td>AC004.2</td><td>unitário</td><td>sem multa</td></tr><tr><td>CT005.1.1</td><td>Consulta do sócio lista vencimentos</td><td>AC005.1</td><td>E2E</td><td>lista com título e vencimento de cada empréstimo ativo</td></tr></tbody></table>
+<h2 id="rastreabilidade">Rastreabilidade</h2>
+<table><thead><tr><th>US</th><th>AC</th><th>Tasks</th><th>Casos de teste</th></tr></thead><tbody><tr><td>US001</td><td>AC001.1</td><td>TSK002, TSK003</td><td>CT001.1.1</td></tr><tr><td>US001</td><td>AC001.2</td><td>TSK003</td><td>CT001.2.1</td></tr><tr><td>US002</td><td>AC002.1</td><td>TSK005</td><td>CT002.1.1</td></tr><tr><td>US003</td><td>AC003.1</td><td>TSK006</td><td>CT003.1.1</td></tr><tr><td>US003</td><td>AC003.2</td><td>TSK006</td><td>CT003.2.1</td></tr><tr><td>US003</td><td>AC003.3</td><td>TSK006</td><td>CT003.3.1</td></tr><tr><td>US004</td><td>AC004.1</td><td>TSK007</td><td>CT004.1.1</td></tr><tr><td>US004</td><td>AC004.2</td><td>TSK007</td><td>CT004.2.1</td></tr><tr><td>US005</td><td>AC005.1</td><td>TSK009</td><td>CT005.1.1</td></tr></tbody></table>
+<h2 id="glossário">Glossário</h2>
+<table><thead><tr><th>Termo</th><th>Definição</th><th>Não confundir com</th></tr></thead><tbody><tr><td>Sócio</td><td>Pessoa cadastrada que pode pegar livros emprestados</td><td>Visitante</td></tr><tr><td>Empréstimo</td><td>Retirada de um exemplar por um sócio com prazo de devolução</td><td>Reserva</td></tr></tbody></table>
+<h2 id="pendências-e-suposições">Pendências e suposições</h2>
+<h3 id="perguntas">Perguntas</h3>
+<table><thead><tr><th>ID</th><th>Pergunta</th><th>Impacto</th><th>Status</th><th>Resposta</th></tr></thead><tbody><tr><td>Q001</td><td>A multa tem teto máximo por empréstimo?</td><td>importante</td><td>respondida</td><td>Sem teto no MVP.</td></tr><tr><td>Q002</td><td>Sócio com multa pendente pode pegar novo livro?</td><td>importante</td><td>aberta</td><td>—</td></tr><tr><td>Q003</td><td>Qual a política de retenção e exclusão dos dados pessoais dos sócios (nome e telefone)?</td><td>importante</td><td>aceita-risco</td><td>—</td></tr></tbody></table>
+<h3 id="suposições">Suposições</h3>
+<table><thead><tr><th>ID</th><th>Suposição</th><th>Confiança</th><th>Se falsa</th><th>Validar com</th></tr></thead><tbody><tr><td>A001</td><td>Cada título possui um único exemplar físico.</td><td>média</td><td>modelo de dados precisa separar título e exemplar</td><td>bibliotecária</td></tr><tr><td>A002</td><td>O sócio se identifica na consulta pelo número da carteirinha.</td><td>média</td><td>inclui autenticação por e-mail ou telefone</td><td>bibliotecária</td></tr></tbody></table>
+<h3 id="lacunas-aceitas">Lacunas aceitas</h3>
+<p>Pendências que seguem sem resposta por decisão de um usuário autorizado.</p>
+<table><thead><tr><th>Lacuna</th><th>Impacto</th><th>Aceito por</th><th>Justificativa</th><th>Artefatos afetados</th></tr></thead><tbody><tr><td>Q003: retenção e exclusão de dados pessoais</td><td>importante</td><td>Bibliotecária (responsável pelo projeto)</td><td>MVP de uso interno; a política será definida antes de abrir a consulta do sócio ao público</td><td>US002, modelo de dados</td></tr></tbody></table>
+<h3 id="aprovação-do-discovery">Aprovação do Discovery</h3>
+<p>Resumo aprovado por <strong>Bibliotecária (responsável pelo projeto)</strong> em 2026-10-20.</p>
+<h2 id="ordem-de-implementação">Ordem de implementação</h2>
+<h3 id="ordem-de-implementação-1">Ordem de implementação</h3>
+<p>Listas separadas para facilitar o planejamento. RF aparecem quando declaradas explicitamente em spec.md; as tasks respeitam dependências conhecidas.</p>
+<h4 id="requisitos-funcionais-rf">Requisitos funcionais (RF)</h4>
+<p>Nenhum requisito com identificador RF foi declarado em <code>03-requisitos/spec.md</code>.</p>
+<h4 id="histórias-de-usuário-us">Histórias de usuário (US)</h4>
+<table><thead><tr><th>Ordem</th><th>ID</th><th>História</th><th>Prioridade</th><th>MVP</th></tr></thead><tbody><tr><td>1</td><td>US001</td><td>Cadastrar livro</td><td>Must</td><td>sim</td></tr><tr><td>2</td><td>US002</td><td>Cadastrar sócio</td><td>Must</td><td>sim</td></tr><tr><td>3</td><td>US003</td><td>Registrar empréstimo</td><td>Must</td><td>sim</td></tr><tr><td>4</td><td>US004</td><td>Registrar devolução com multa</td><td>Must</td><td>sim</td></tr><tr><td>5</td><td>US005</td><td>Consultar meus empréstimos</td><td>Should</td><td>não</td></tr></tbody></table>
+<h4 id="tasks-1">Tasks</h4>
+<table><thead><tr><th>Ordem</th><th>ID</th><th>Task</th><th>Depende de</th><th>Refs</th><th>Estimativa</th></tr></thead><tbody><tr><td>1</td><td>TSK001</td><td>Preparar repositório, CI e deploy em PaaS</td><td>—</td><td>ADR-001, RNF002</td><td>5</td></tr><tr><td>2</td><td>TSK002</td><td>Modelar e migrar tabelas livro, sócio e empréstimo</td><td>TSK001</td><td>US001, US002, US003, AC001.1</td><td>3</td></tr><tr><td>3</td><td>TSK004</td><td>Autenticação da bibliotecária</td><td>TSK001</td><td>RNF002, US001</td><td>3</td></tr><tr><td>4</td><td>TSK003</td><td>API de cadastro de livros</td><td>TSK002</td><td>US001, AC001.1, AC001.2</td><td>3</td></tr><tr><td>5</td><td>TSK005</td><td>API de cadastro de sócios</td><td>TSK002</td><td>US002, AC002.1</td><td>2</td></tr><tr><td>6</td><td>TSK006</td><td>API de empréstimo com regras de prazo e limite</td><td>TSK003, TSK005</td><td>US003, AC003.1, AC003.2, AC003.3, RN001, RN002</td><td>5</td></tr><tr><td>7</td><td>TSK007</td><td>API de devolução e cálculo de multa</td><td>TSK006</td><td>US004, AC004.1, AC004.2, RN003</td><td>3</td></tr><tr><td>8</td><td>TSK009</td><td>Consulta de empréstimos do sócio (mobile)</td><td>TSK006</td><td>US005, AC005.1, RNF001</td><td>3</td></tr><tr><td>9</td><td>TSK008</td><td>Telas da bibliotecária (livros, sócios, empréstimo, devolução)</td><td>TSK006, TSK007</td><td>US001, US002, US003, US004</td><td>5</td></tr></tbody></table></body></html>
