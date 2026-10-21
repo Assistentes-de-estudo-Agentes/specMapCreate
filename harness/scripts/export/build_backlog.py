@@ -3,6 +3,11 @@
 import datetime
 import json
 import sys
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -47,13 +52,42 @@ def main():
                              "casos_de_teste": [c["id"] for c in tests if any(x in {ac["id"] for ac in s["acs"]} for x in c["cobre"])],
                              "tasks": by_story.get(s["id"], [])})
         epicos.append({"id": e["id"], "titulo": e["title"], "historias": hist})
-    out = {"versao_schema": 1, "projeto": proj.get("nome", ""), "metodologia": proj.get("metodologia", ""),
+    # Ordenação topológica estável das tasks; dependências desconhecidas não bloqueiam.
+    by_task = {t["id"]: t for t in tasks}
+    pending = list(tasks); ordered_tasks = []; done = set()
+    while pending:
+        ready = [t for t in pending if all(d not in by_task or d in done for d in t["depende"])]
+        if not ready:
+            ordered_tasks.extend(pending)
+            break
+        for task in ready:
+            ordered_tasks.append(task); done.add(task["id"]); pending.remove(task)
+    rf = [{"id": i, "texto": t} for i, t in spec.get("rf", [])]
+    us_order = [{"ordem": i, "id": st["id"], "titulo": st["title"]}
+                for i, st in enumerate(spec["stories"], 1)]
+    task_order = [{"ordem": i, "id": t["id"], "titulo": t["title"],
+                   "depende_de": t["depende"], "refs": t["refs"]}
+                  for i, t in enumerate(ordered_tasks, 1)]
+    out = {"versao_schema": 2, "projeto": proj.get("nome", ""), "metodologia": proj.get("metodologia", ""),
            "gerado_em": datetime.date.today().isoformat(), "epicos": epicos, "fundacao": fundacao,
-           "rnf": [{"id": i, "texto": t} for i, t in spec["rnf"]]}
+           "requisitos_funcionais": rf,
+           "regras_de_negocio": [{"id": i, "texto": t} for i, t in spec["rn"]],
+           "rnf": [{"id": i, "texto": t} for i, t in spec["rnf"]],
+           "ordem_implementacao": {"rf": [x["id"] for x in rf],
+                                   "us": [x["id"] for x in us_order],
+                                   "tasks": [x["id"] for x in task_order]},
+           "catalogo_ordem": {"rf": rf, "us": us_order, "tasks": task_order}}
     dest = sdd / "07-export" / "backlog.json"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"backlog gerado: {dest} ({sum(len(e['historias']) for e in epicos)} US, {len(tasks)} tasks)")
+    serialized = json.dumps(out, ensure_ascii=False, indent=2)
+    dest.write_text(serialized + "\n", encoding="utf-8")
+    ydest = dest.with_suffix(".yml")
+    if yaml:
+        ydest.write_text(yaml.safe_dump(out, allow_unicode=True, sort_keys=False, width=100), encoding="utf-8")
+    else:
+        # JSON é subconjunto válido de YAML 1.2 e mantém os dados sem dependências extras.
+        ydest.write_text(serialized + "\n", encoding="utf-8")
+    print(f"backlog gerado: {dest} e {ydest} ({sum(len(e['historias']) for e in epicos)} US, {len(tasks)} tasks)")
 
 
 if __name__ == "__main__":

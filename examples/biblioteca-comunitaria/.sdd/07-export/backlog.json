@@ -1,8 +1,8 @@
 {
-  "versao_schema": 1,
+  "versao_schema": 2,
   "projeto": "Biblioteca Comunitária",
   "metodologia": "scrum",
-  "gerado_em": "2026-10-20",
+  "gerado_em": "2026-10-21",
   "epicos": [
     {
       "id": "EP001",
@@ -352,6 +352,21 @@
       "casos_de_teste": []
     }
   ],
+  "requisitos_funcionais": [],
+  "regras_de_negocio": [
+    {
+      "id": "RN001",
+      "texto": "O prazo de empréstimo é de 14 dias corridos."
+    },
+    {
+      "id": "RN002",
+      "texto": "Cada sócio pode ter no máximo 3 empréstimos ativos."
+    },
+    {
+      "id": "RN003",
+      "texto": "A multa é de R$ 0,50 por dia corrido de atraso, sem teto."
+    }
+  ],
   "rnf": [
     {
       "id": "RNF001",
@@ -361,5 +376,178 @@
       "id": "RNF002",
       "texto": "O acesso à área da bibliotecária exige autenticação com senha de no mínimo 10 caracteres."
     }
-  ]
+  ],
+  "ordem_implementacao": {
+    "rf": [],
+    "us": [
+      "US001",
+      "US002",
+      "US003",
+      "US004",
+      "US005"
+    ],
+    "tasks": [
+      "TSK001",
+      "TSK002",
+      "TSK004",
+      "TSK003",
+      "TSK005",
+      "TSK006",
+      "TSK007",
+      "TSK009",
+      "TSK008"
+    ]
+  },
+  "catalogo_ordem": {
+    "rf": [],
+    "us": [
+      {
+        "ordem": 1,
+        "id": "US001",
+        "titulo": "Cadastrar livro"
+      },
+      {
+        "ordem": 2,
+        "id": "US002",
+        "titulo": "Cadastrar sócio"
+      },
+      {
+        "ordem": 3,
+        "id": "US003",
+        "titulo": "Registrar empréstimo"
+      },
+      {
+        "ordem": 4,
+        "id": "US004",
+        "titulo": "Registrar devolução com multa"
+      },
+      {
+        "ordem": 5,
+        "id": "US005",
+        "titulo": "Consultar meus empréstimos"
+      }
+    ],
+    "tasks": [
+      {
+        "ordem": 1,
+        "id": "TSK001",
+        "titulo": "Preparar repositório, CI e deploy em PaaS",
+        "depende_de": [],
+        "refs": [
+          "ADR-001",
+          "RNF002"
+        ]
+      },
+      {
+        "ordem": 2,
+        "id": "TSK002",
+        "titulo": "Modelar e migrar tabelas livro, sócio e empréstimo",
+        "depende_de": [
+          "TSK001"
+        ],
+        "refs": [
+          "US001",
+          "US002",
+          "US003",
+          "AC001.1"
+        ]
+      },
+      {
+        "ordem": 3,
+        "id": "TSK004",
+        "titulo": "Autenticação da bibliotecária",
+        "depende_de": [
+          "TSK001"
+        ],
+        "refs": [
+          "RNF002",
+          "US001"
+        ]
+      },
+      {
+        "ordem": 4,
+        "id": "TSK003",
+        "titulo": "API de cadastro de livros",
+        "depende_de": [
+          "TSK002"
+        ],
+        "refs": [
+          "US001",
+          "AC001.1",
+          "AC001.2"
+        ]
+      },
+      {
+        "ordem": 5,
+        "id": "TSK005",
+        "titulo": "API de cadastro de sócios",
+        "depende_de": [
+          "TSK002"
+        ],
+        "refs": [
+          "US002",
+          "AC002.1"
+        ]
+      },
+      {
+        "ordem": 6,
+        "id": "TSK006",
+        "titulo": "API de empréstimo com regras de prazo e limite",
+        "depende_de": [
+          "TSK003",
+          "TSK005"
+        ],
+        "refs": [
+          "US003",
+          "AC003.1",
+          "AC003.2",
+          "AC003.3",
+          "RN001",
+          "RN002"
+        ]
+      },
+      {
+        "ordem": 7,
+        "id": "TSK007",
+        "titulo": "API de devolução e cálculo de multa",
+        "depende_de": [
+          "TSK006"
+        ],
+        "refs": [
+          "US004",
+          "AC004.1",
+          "AC004.2",
+          "RN003"
+        ]
+      },
+      {
+        "ordem": 8,
+        "id": "TSK009",
+        "titulo": "Consulta de empréstimos do sócio (mobile)",
+        "depende_de": [
+          "TSK006"
+        ],
+        "refs": [
+          "US005",
+          "AC005.1",
+          "RNF001"
+        ]
+      },
+      {
+        "ordem": 9,
+        "id": "TSK008",
+        "titulo": "Telas da bibliotecária (livros, sócios, empréstimo, devolução)",
+        "depende_de": [
+          "TSK006",
+          "TSK007"
+        ],
+        "refs": [
+          "US001",
+          "US002",
+          "US003",
+          "US004"
+        ]
+      }
+    ]
+  }
 }
